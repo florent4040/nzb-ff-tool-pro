@@ -61,7 +61,7 @@ pub fn release_files(dir: &Path) -> Option<Files> {
     let origin = crate::ngpost::nfo_origin(dir);
     f.nfo_original = origin.starts_with("origine") || origin == "modifie";
     // série : marquée à la préparation, sinon épisode nommé dans le rapport MediaInfo
-    // (« Complete name : Titre.S01E01… ») — pour les releases préparées avant le marqueur
+    // (« Complete name : Titre.S01E01… »), pour les releases préparées avant le marqueur
     f.series = crate::ngpost::is_marked_series(dir) || f.mediainfo.as_ref().or(f.other_report.as_ref()).map(|r| report_names_episode(r)).unwrap_or(false);
     (!f.nzb.as_os_str().is_empty()).then_some(f)
 }
@@ -1301,7 +1301,7 @@ pub fn upload(idx: &IndexerCfg, release: &str, dir: &Path) -> Result<Reply, UpEr
     if let Ok(r) = &mut res {
         r.message = mask(&r.message, &key);
         if (idx.mode == "newznab" || idx.mode == "rest") && idx.send_mi && f.mediainfo.is_none() && f.other_report.is_some() {
-            r.message.push_str(" — rapport MediaInfo non joint : l'indexer attend du XML");
+            r.message.push_str(", rapport MediaInfo non joint : l'indexer attend du XML");
         }
     }
     res
@@ -1442,7 +1442,7 @@ pub fn parse_caps(body: &str, http: Option<u16>) -> Result<(String, Vec<(String,
 mod tests {
     use super::*;
 
-    /// Liste complète d'un indexer (exemple fourni, au format t=caps) : tout est rempli —
+    /// Liste complète d'un indexer (exemple fourni, au format t=caps) : tout est rempli,
     /// films et séries par résolution et en FR, et chaque catégorie de contenu.
     #[test]
     fn categorie_choisie_a_la_main() {

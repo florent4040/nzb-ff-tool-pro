@@ -1073,7 +1073,7 @@ pub fn autoconfig(base: &IndexerCfg, url: &str, key: &str, delay_secs: u64, max:
             Ok(c) => {
                 newznab = true;
                 let modes: Vec<String> = c.modes.iter().map(|m| m.0.clone()).collect();
-                say(&mut out, '✔', format!("API Newznab : {}{} — recherche : {}", if c.title.is_empty() { "sans nom".into() } else { c.title.clone() }, if c.limit_max > 0 { format!(", {} résultats au plus", c.limit_max) } else { String::new() }, if modes.is_empty() { "?".into() } else { modes.join(", ") }), on);
+                say(&mut out, '✔', format!("API Newznab : {}{}, recherche : {}", if c.title.is_empty() { "sans nom".into() } else { c.title.clone() }, if c.limit_max > 0 { format!(", {} résultats au plus", c.limit_max) } else { String::new() }, if modes.is_empty() { "?".into() } else { modes.join(", ") }), on);
                 say(&mut out, '✔', format!("{} catégorie(s) lues{}", c.cats.len(), if c.groups.is_empty() { String::new() } else { format!(", {} groupe(s) Usenet indexé(s)", c.groups.len()) }), on);
                 out.idx.cat_list = c.cats.clone();
                 out.idx.groups = c.groups.clone();
@@ -1086,7 +1086,7 @@ pub fn autoconfig(base: &IndexerCfg, url: &str, key: &str, delay_secs: u64, max:
                             .iter()
                             .filter_map(|k| out.idx.cat_map.iter().find(|(x, _)| x == k).map(|(x, v)| format!("{} → {v}{}", crate::upload::rule_label(x), crate::upload::cat_label(&out.idx, v).map(|l| format!(" ({l})")).unwrap_or_default())))
                             .collect();
-                        say(&mut out, '✔', format!("{n} case(s) de catégorie remplie(s){}", if ex.is_empty() { String::new() } else { format!(" — ex. {}", ex.join(" · ")) }), on);
+                        say(&mut out, '✔', format!("{n} case(s) de catégorie remplie(s){}", if ex.is_empty() { String::new() } else { format!(", ex. {}", ex.join(" · ")) }), on);
                     }
                 }
                 // groupes exigés : un groupe indexé adapté est ajouté au post s'il le faut

@@ -268,7 +268,7 @@ pub fn refresh_autostart() -> bool {
 
 /// Démarrage dans la zone de notification : eframe rend la fenêtre visible après sa première
 /// image, donc après notre `hide_main`. Pendant quelques secondes, un fil la recache aussitôt
-/// qu'elle apparaît — jusqu'à ce que l'utilisateur l'ouvre lui-même (`show_main`).
+/// qu'elle apparaît, jusqu'à ce que l'utilisateur l'ouvre lui-même (`show_main`).
 pub fn keep_hidden_at_start() {
     HIDDEN.store(true, Ordering::Relaxed);
     #[cfg(windows)]

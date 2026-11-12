@@ -2331,7 +2331,7 @@ fn wiki(text: &str) -> Import {
         let l = line.trim();
         let cells: Vec<String> = l.trim_matches('|').split('|').map(|c| c.trim().trim_matches('`').trim().to_string()).collect();
         let (name, rest) = if cells.len() >= 2 {
-            (cells[0].clone(), cells[1..].join(" — "))
+            (cells[0].clone(), cells[1..].join(", "))
         } else if let Some((a, b)) = l.trim_start_matches(['-', '*', ' ']).split_once(" - ").or_else(|| l.trim_start_matches(['-', '*', ' ']).split_once(" : ")) {
             (a.trim().trim_matches('`').to_string(), b.trim().to_string())
         } else {

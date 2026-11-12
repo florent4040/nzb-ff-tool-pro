@@ -141,7 +141,7 @@ pub fn spawn(shared: Arc<Mutex<Config>>, on_sent: Box<dyn Fn(Result<String, Stri
 
 /// Modèles par défaut de l'objet et du texte.
 pub const DEFAULT_SUBJECT: &str = "{app} : traitements terminés ({bilan})";
-pub const DEFAULT_BODY: &str = "Bonjour,\n\nTous les traitements en cours sont terminés : {bilan}.\n\n{resume}\n\n— {app} {version} sur {machine}";
+pub const DEFAULT_BODY: &str = "Bonjour,\n\nTous les traitements en cours sont terminés : {bilan}.\n\n{resume}\n\n{app} {version} sur {machine}";
 
 /// Champs utilisables dans l'objet et le texte : (champ, explication).
 pub const FIELDS: &[(&str, &str)] = &[
@@ -459,11 +459,11 @@ pub fn send(cfg: &Config, subject: &str, body: &str) -> Result<String, String> {
     let err = String::from_utf8_lossy(&out.stderr).trim().to_string();
     let err = if cfg.mail_pass.is_empty() { err } else { err.replace(&cfg.mail_pass, "•••") };
     let hint = match out.status.code() {
-        Some(67) => " — identifiant ou mot de passe refusé (souvent : il faut un mot de passe d'application)",
-        Some(6) | Some(7) => " — serveur injoignable : vérifie le nom et le port",
-        Some(28) => " — délai dépassé : vérifie le port et la sécurité (SSL 465 / STARTTLS 587)",
-        Some(35) | Some(60) => " — échec de la connexion sécurisée : essaie l'autre sécurité (SSL / STARTTLS)",
-        Some(55) | Some(56) => " — le serveur a coupé : adresse d'expéditeur refusée ?",
+        Some(67) => ", identifiant ou mot de passe refusé (souvent : il faut un mot de passe d'application)",
+        Some(6) | Some(7) => ", serveur injoignable : vérifie le nom et le port",
+        Some(28) => ", délai dépassé : vérifie le port et la sécurité (SSL 465 / STARTTLS 587)",
+        Some(35) | Some(60) => ", échec de la connexion sécurisée : essaie l'autre sécurité (SSL / STARTTLS)",
+        Some(55) | Some(56) => ", le serveur a coupé : adresse d'expéditeur refusée ?",
         _ => "",
     };
     Err(format!("envoi refusé (code {:?}) : {err}{hint}", out.status.code()))
@@ -532,9 +532,9 @@ mod tests {
     #[ignore]
     fn apercu_html() {
         let Ok(dir) = std::env::var("NZBFF_MAIL_HTML") else { return };
-        let bad = "Résumé des traitements terminés à 21:42\n\n21:12  ✔ Posté : Le.Film.2020.FRENCH.1080p.WEB.H264-GRP (4,2 Go, 52 s)\n21:13  ✔ Déposé sur NZBFrance\n21:13  ✖ Dépôt refusé par Indexer2 : HTTP 405 Method Not Allowed\n        l'adresse d'envoi n'est pas la bonne : « Chercher l'adresse d'envoi » dans ses réglages\n21:30  ⚠ Une.Serie.S01E02 déjà présente sur Indexer3 (déposée quand même)\n21:41  ✔ Posté : Une.Serie.S01E03.FRENCH.720p.WEB-X";
-        let warn = "Résumé des traitements terminés à 08:05\n\n07:58  ✔ Posté : Album-2024-WEB-FLAC (612 Mo)\n07:59  ⏭ NZBFrance ignoré : déjà présente (uploadée à la main)\n08:05  ✔ Déposé sur Indexer3";
-        let good = "Résumé des traitements terminés à 13:20\n\n13:02  ✔ Posté : Dune.2021.MULTi.2160p.WEB.H265-SUPPLY (18,2 Go)\n13:20  ✔ Déposé sur NZBFrance, Indexer3, Usenet-Fr";
+        let bad = "Résumé des traitements terminés à 21:42\n\n21:12  ✔ Posté : Le.Film.2020.FRENCH.1080p.WEB.H264-GRP (4,2 Go, 52 s)\n21:13  ✔ Déposé sur IndexerA\n21:13  ✖ Dépôt refusé par IndexerC : HTTP 405 Method Not Allowed\n        l'adresse d'envoi n'est pas la bonne : « Chercher l'adresse d'envoi » dans ses réglages\n21:30  ⚠ Une.Serie.S01E02 déjà présente sur IndexerB (déposée quand même)\n21:41  ✔ Posté : Une.Serie.S01E03.FRENCH.720p.WEB-X";
+        let warn = "Résumé des traitements terminés à 08:05\n\n07:58  ✔ Posté : Album-2024-WEB-FLAC (612 Mo)\n07:59  ⏭ IndexerA ignoré : déjà présente (uploadée à la main)\n08:05  ✔ Déposé sur IndexerB";
+        let good = "Résumé des traitements terminés à 13:20\n\n13:02  ✔ Posté : Dune.2021.MULTi.2160p.WEB.H265-SUPPLY (18,2 Go)\n13:20  ✔ Déposé sur IndexerA, IndexerB, IndexerD";
         for (n, b) in [("rouge", bad), ("jaune", warn), ("vert", good)] {
             std::fs::write(format!("{dir}/mail-{n}.html"), html_body("NZB FF Tool : 3 traitements terminés", b)).unwrap();
         }

@@ -1081,7 +1081,7 @@ impl WatchRoute {
                     "{} → téléchargé ({add}) puis reposté {} sur {}",
                     if self.origin.is_empty() { "trouvé ailleurs".to_string() } else { format!("trouvé sur {}", self.origin) },
                     if self.auto(cfg) { "tout seul" } else { "d'un clic (« Reposter »)" },
-                    if t.is_empty() { "— aucun indexer : rien ne sera reposté".to_string() } else { t.join(", ") }
+                    if t.is_empty() { "aucun indexer : rien ne sera reposté".to_string() } else { t.join(", ") }
                 )
             }
             "dl" => format!("téléchargé seulement ({add}), pas de repost"),

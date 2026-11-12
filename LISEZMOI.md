@@ -14,13 +14,13 @@ envoi vers le dossier surveillé par ton logiciel de post (NgPost ou autre), his
   = une image), les barres de téléchargement **glissent** au lieu de sauter, et le client est
   relevé chaque seconde quand un téléchargement avance (3 s sinon).
 - **Configuration automatique complète** : recherche sur l'API Newznab (`/api`) **et** envoi
-  sur l'adresse à part (`/v1/upload`) — le mode « adresse d'envoi à part » ne remplace pas la
+  sur l'adresse à part (`/v1/upload`), le mode « adresse d'envoi à part » ne remplace pas la
   recherche, elle reste sur `/api`. Les **numéros de catégorie** (films et séries SD / 720p /
   1080p / UHD, FR, autres contenus) et les **groupes Usenet** sont repris tout seuls ; un groupe
   indexé adapté est ajouté au post s'il le faut. Testé de bout en bout contre un faux indexer :
   capacités, clé, recherche, envoi réel avec catégorie.
 - **« Réglage actuel » de chaque indexer**, en tête de sa fiche : recherche, envoi, catégories,
-  groupes, User-Agent — vert quand c'est prêt, rouge sinon.
+  groupes, User-Agent, vert quand c'est prêt, rouge sinon.
 - **Groupes Usenet par catégorie de l'indexer** (fiche de l'indexer) : ex. 2045 → 
   alt.binaries.hdtv.x264 ; 2000 vaut pour toute la famille Movies.
 - **Ma requête** (fiche de l'indexer → Recherche et API) : écris une adresse, « POST … » ou
@@ -29,7 +29,7 @@ envoi vers le dossier surveillé par ton logiciel de post (NgPost ou autre), his
 - **User-Agent** (Réglages → Indexers, et par indexer) : curl, NZB FF Tool Pro, navigateur
   courant tiré au sort au lancement, roulement à chaque requête, ou texte personnalisé.
 - **Traitement** : « Que faire, et pour quels indexers ? » juste sous le nom (avant : tout en
-  bas) — aussi dans Série et Autre contenu ; la catégorie par défaut affiche son nom chez
+  bas), aussi dans Série et Autre contenu ; la catégorie par défaut affiche son nom chez
   l'indexer (« défaut (2040 · Movies > HD) ») ; **choix des groupes Usenet** du post (puces
   proposées d'après le contenu, tes réglages et les groupes indexés, ou saisie libre), avec ce
   que chaque indexer en pense.
@@ -88,7 +88,7 @@ envoi vers le dossier surveillé par ton logiciel de post (NgPost ou autre), his
   selon son résultat ; le texte brut reste joint (Réglages → E-mail → « E-mail en couleur »).
 - **Processeur au repos** : l'application dans la zone de notification ne redessine plus rien
   (environ 12 % de processeur avant pendant la surveillance, à peu près 0 maintenant) ; fenêtre
-  ouverte, 1 image par seconde au repos. Rappel : **aucune télémétrie, aucun mouchard** —
+  ouverte, 1 image par seconde au repos. Rappel : **aucune télémétrie, aucun mouchard**,
   l'application ne contacte que tes indexers, ton client de téléchargement, tes serveurs
   Usenet et ton serveur d'e-mail.
 
@@ -107,7 +107,7 @@ envoi vers le dossier surveillé par ton logiciel de post (NgPost ou autre), his
     `_Ailleurs`, `_Télécharger seulement`, et **tes propres sous-dossiers** (« ➕ Ajouter une
     règle », ex. `Séries 4K\`) ;
   - pour chaque règle : **action** (télécharger seulement, télécharger puis reposter, me
-    demander, déposer tel quel sur les indexers, comme un double clic — racine —, ignorer),
+    demander, déposer tel quel sur les indexers, comme un double clic, racine, ignorer),
     indexer d'origine et **indexers visés**, repost **tout seul ou d'un clic**, **catégorie
     du client**, **priorité**, **en pause** ; la phrase sous chaque règle dit ce qui sera
     fait ; « ⟲ Par défaut » remet une règle de base ;
@@ -124,7 +124,7 @@ envoi vers le dossier surveillé par ton logiciel de post (NgPost ou autre), his
   le message dit pourquoi (par2, compression, identification au serveur…) et **où est la vidéo**
   (« Rien n'a été supprimé ni déplacé : la vidéo est toujours dans … ») ; si elle a disparu
   pendant le post, il le dit aussi (un autre programme l'a prise : NgPost ouvert en surveillance
-  du même dossier, par exemple — le récapitulatif signale ce cas).
+  du même dossier, par exemple, le récapitulatif signale ce cas).
 - **Cause de l'échec « par2 code 3 » corrigée** (« Ignoring non-existent source file :
   D:\xxx.7z.001 ») : NgPost ajoute « /archive » au dossier temporaire, et par2cmdline(-turbo)
   coupait le chemin mélangé « D:\tmp/archive/… » au mauvais endroit. Le dossier temporaire (des
@@ -226,7 +226,7 @@ Ensuite, selon le réglage (Réglages → Indexers → « Avant de poster : déj
 |---|---|---|
 | **Ne pas la poster pour cet indexer** (défaut) | postée seulement pour les autres | pas postée : fenêtre « Déjà présente », avec « ⬆ Poster quand même » |
 | Signaler seulement | postée quand même, signalée | postée quand même, signalée |
-| Ne pas vérifier | — | — |
+| Ne pas vérifier |, |, |
 
 Une fois l'absence confirmée, la release est postée **sous son nom final** (renommé ou
 non). Tout est écrit :
@@ -423,7 +423,7 @@ Traitement), section **Séries** de la page Lot, ou inbox :
   saisons, les dossiers `Saison N` sont créés ; chaque épisode garde exactement son nom.
   « Renommer aussi les épisodes » (décoché) les renomme `Titre.S01E02.FRENCH.1080p…`.
   Une ancienne configuration où c'était coché le reste : décoche-le dans Réglages → Séries.
-- **Releases à créer (plusieurs tours, postés dans cet ordre)** — page Série et Réglages → Séries
+- **Releases à créer (plusieurs tours, postés dans cet ordre)**, page Série et Réglages → Séries
   (inbox, Lot) ; au moins un coché :
   1. **toute la série** en une release (un NZB), avec la mention complète si elle l'est ;
   2. **une release par saison** (un NZB par saison) ;
@@ -676,7 +676,7 @@ pour voir ce qui n'a pas été compris.
     désactivés ignorés, mesures complètes de chaque test (connexion, TLS, réponse médiane et
     meilleure, débit et articles lus, identifiants, accueil) et valeur de classement ;
   - réglages du post : taille des articles, fils, essais, obfuscation, compression (volumes,
-    noms, mot de passe aléatoire / fixe / aucun — jamais sa valeur ici), par2, vérification ;
+    noms, mot de passe aléatoire / fixe / aucun, jamais sa valeur ici), par2, vérification ;
   - lignes techniques des connexions NgPost (sinon gardées dans le fichier journal) ;
   - réponses entières des indexers (sinon 40 lignes).
   Mots de passe et clés API jamais écrits, quel que soit le niveau.
@@ -725,7 +725,7 @@ propose « Utiliser ». Puis : dossier racine des indexers (ex. `Indexers NZB`) 
 
 ## Envoyer des NZB (déjà postés, ou déjà en ta possession)
 
-Page « 🔁 Envoyer des NZB » : déposer sur d'autres indexers un NZB qui existe déjà — **rien
+Page « 🔁 Envoyer des NZB » : déposer sur d'autres indexers un NZB qui existe déjà, **rien
 n'est reposté sur Usenet**. Le haut de la page montre où tu en es :
 ① Releases → ② Indexers → ③ Ce qui part → ④ Dépôt.
 1. **Quelles releases ?** Deux onglets :
@@ -979,7 +979,7 @@ articles `nzbCheck`). Plusieurs serveurs par fournisseur (régions, ports 563 / 
 - « Utiliser les serveurs configurés ici » : au moment du post, NgPost reçoit une **copie** de
   ngPost.conf (mêmes options) dont les serveurs sont remplacés par ceux-ci ; ngPost.conf n'est
   jamais modifié, la copie est effacée à la fin du post. Mode « ligne de commande » seulement.
-- « ⏱ Tester » / « Tester tous les serveurs » : **test complet** de chaque serveur — connexion,
+- « ⏱ Tester » / « Tester tous les serveurs » : **test complet** de chaque serveur, connexion,
   chiffrement TLS, **identifiants** (refusés : signalé en rouge), temps de réponse à 8 commandes,
   puis 5 s de lecture d'articles (`alt.binaries.boneless`) pour le débit. ★ = identifiants acceptés
   et meilleur temps de réponse. Sous Windows, le SSL passe par PowerShell (fourni avec Windows,
@@ -1003,9 +1003,9 @@ articles `nzbCheck`). Plusieurs serveurs par fournisseur (régions, ports 563 / 
   serveur de vérification reste). Désactivé : tous servent ensemble avec leurs connexions
   « simultané ».
 - **Journal du post** : comment les serveurs sont choisis, chaque test (temps de réponse,
-  débit, identifiants), le serveur retenu, puis le détail de chaque serveur utilisé —
+  débit, identifiants), le serveur retenu, puis le détail de chaque serveur utilisé,
   fournisseur, serveur:port, SSL, connexions, identifiant (jamais le mot de passe), vérification
-  des articles — et le total des connexions du post. Serveurs non gérés ici : ceux de
+  des articles, et le total des connexions du post. Serveurs non gérés ici : ceux de
   ngPost.conf sont détaillés de la même façon. Encore plus de détail : voir « Journaux ».
 
 ### Jamais de dépôt sans MediaInfo
@@ -1027,21 +1027,21 @@ Les autres contenus (jeux, logiciels…) n'ont de rapport que si leur catégorie
 - nouvel essai automatique seulement quand rien n'a pu arriver à l'indexer (connexion
   impossible, 429 trop de requêtes, 503) ;
 - réponse perdue ou erreur pendant le traitement (délai dépassé, coupure, 500, 502, 504,
-  520–524 — fréquent avec un gros NZB) : **pas de renvoi**. Une recherche sur l'indexer
+  520–524, fréquent avec un gros NZB) : **pas de renvoi**. Une recherche sur l'indexer
   (Newznab) vérifie si la release est arrivée : oui → « Déjà uploadés » ; non ou impossible à
   vérifier → message dans le journal, à toi de regarder puis « ⇪ Déposer (API) » ou « ✔ Uploadé ».
 - La clé API ne passe jamais sur la ligne de commande de curl (fichier `-K` temporaire).
 
 **Voir ce qui est envoyé** :
 - Réglages → Indexers (dépôt par API) : « Requête envoyée », la requête réelle (clé masquée)
-  pour un film et une série d'exemple — adresse, paramètres et chaque champ du formulaire, avec
+  pour un film et une série d'exemple, adresse, paramètres et chaque champ du formulaire, avec
   la catégorie.
 - Chaque dépôt est détaillé dans le **Journal** et dans `logs\api-AAAA-MM-JJ.log` : requête,
   code HTTP, réponse complète de l'indexer, et **catégorie qu'il a attribuée** (avertissement si
-  elle diffère de celle envoyée — souvent : numéros de catégorie propres à cet indexer, à
+  elle diffère de celle envoyée, souvent : numéros de catégorie propres à cet indexer, à
   vérifier avec « Tester la connexion »).
 - **Doublon** (`dupecheck`) : si l'indexer a déjà la release, il refuse le nouveau dépôt et garde
-  la sienne, **catégorie comprise** — signalé en avertissement. Pour la recatégoriser : la
+  la sienne, **catégorie comprise**, signalé en avertissement. Pour la recatégoriser : la
   supprimer sur le site, puis « ↩ » et « ⇪ Déposer (API) ».
 - « Aucune » catégorie : avec un NZB obfusqué, l'indexer ne voit que le nom et peut se tromper ;
   « Selon la résolution (films / séries) » est conseillé.
@@ -1090,8 +1090,8 @@ Réglages → Indexers → « ⚙ Dépôt » sur chaque indexer :
 Réponses comprises : succès (XML Newznab `<success>`, JSON `release` / `success` / HTTP 2xx),
 doublon (Newznab 601, HTTP 409 : compté comme déposé), clé refusée (401), droits
 insuffisants (403), requête invalide (400, 405, 422) avec le message de l'indexer.
-Erreurs passagères — trop de requêtes (429, délai `retry_after` respecté), serveur en
-erreur ou indisponible (500, 502, 503, 504), coupure réseau — : nouvel essai automatique,
+Erreurs passagères, trop de requêtes (429, délai `retry_after` respecté), serveur en
+erreur ou indisponible (500, 502, 503, 504), coupure réseau : nouvel essai automatique,
 5 fois au plus.
 
 **Détail de chaque dépôt** sur les pages Traitement, Lot, Série et Autre contenu (carte
@@ -1198,7 +1198,7 @@ chaque modification, puis s'efface.
   solutions s'affichent en haut de la page :
   1. **déplacer la release sur un autre disque** (place libre de chaque disque affichée ;
      dossier `NZB FF Tool Pro - releases` à sa racine, archives sur ce disque si besoin) puis
-     poster avec compression — conseillé ;
+     poster avec compression, conseillé ;
   2. garder la release et mettre seulement les archives sur un autre disque ;
   3. série : compresser en plusieurs lots qui tiennent dans la place libre, **un seul NZB**
      fusionné à la fin, même mot de passe ; chaque archive garde `Série/Saison N/…` (option
@@ -1225,7 +1225,7 @@ chaque modification, puis s'efface.
 ## Notification par e-mail
 
 Réglages → « Notification par e-mail » : **un seul** e-mail quand tous les traitements sont
-terminés (copies, posts, dépôts sur les indexers, reposts) depuis 45 secondes — il attend aussi
+terminés (copies, posts, dépôts sur les indexers, reposts) depuis 45 secondes, il attend aussi
 les posts et dépôts encore en file et, avec NgPost en surveillance de dossier, les releases dont
 le NZB n'est pas encore là (au plus 6 h) ; jamais d'e-mail vide, jamais deux fois le même
 résumé (même avec deux fenêtres ouvertes), une adresse écrite deux fois n'en reçoit qu'un, avec le résumé : releases
@@ -1242,7 +1242,7 @@ mot de passe d'application. Bouton « Envoyer un e-mail de test ».
   `{date}`, `{heure}`, `{machine}`, `{app}`, `{version}` (un clic les insère au curseur).
   Vides = modèles par défaut ; « Aperçu avec un exemple » ; l'e-mail de test utilise ton modèle.
 - **Dépôts sur les indexers** : chaque dépôt réussi est écrit clairement (« ✔ Déposée sur
-  altHUB : … — envoyée en 5042, classée par l'indexer en 5340 ») ; une erreur d'API est suivie
+  altHUB : …, envoyée en 5042, classée par l'indexer en 5340 ») ; une erreur d'API est suivie
   de la réponse de l'indexer telle quelle.
 
 ## Enregistrement, sauvegarde et restauration
@@ -1265,7 +1265,7 @@ Réglages → « Sauvegarde et restauration » :
 - **Sauvegarde automatique** (activée) de la **configuration complète** (dossiers, NgPost,
   indexers et clés API, serveurs Usenet, e-mail, séries, catégories, thème…), de l'historique et
   des statistiques, copiés dans `%APPDATA%\NZB FF Tool Pro\sauvegarde`, avec la date et l'heure de
-  la dernière sauvegarde. **Quand** : au choix, en cochant — à chaque modification des réglages,
+  la dernière sauvegarde. **Quand** : au choix, en cochant, à chaque modification des réglages,
   à intervalle régulier (10 min, 30 min, 1 h, 2 h, 3 h, 4 h, 6 h, 8 h, 12 h ou 24 h, fenêtre cachée
   comprise ; prochaine sauvegarde affichée), à la fermeture de l'application (y compris « Quitter »
   depuis l'icône), au démarrage. Nombre de copies datées des réglages gardées (une par jour) :

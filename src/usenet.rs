@@ -528,7 +528,7 @@ pub fn servers_for_post(cfg: &Config, on_line: &mut dyn FnMut(&str)) -> Vec<Serv
             on_line(&format!(
                 "Serveur le plus rapide retenu ({ms} ms) : {}{}",
                 best.describe_with(solo),
-                if solo != best.connections { format!(" — utilisé seul : {solo} connexions au lieu de {} en simultané", best.connections) } else { String::new() }
+                if solo != best.connections { format!(", utilisé seul : {solo} connexions au lieu de {} en simultané", best.connections) } else { String::new() }
             ));
             best.connections = solo;
             let mut v = vec![best];
@@ -586,7 +586,7 @@ pub fn write_post_conf(cfg: &Config, base: Option<&Path>, dir: &Path, on_line: &
     let total: u32 = servers.iter().filter(|s| !s.nzb_check || servers.len() == 1).map(|s| s.connections).sum();
     on_line(&format!("Serveurs gérés par l'application : {} serveur(s), {total} connexion(s) en tout pour le post", servers.len()));
     for s in &servers {
-        let role = if s.nzb_check && servers.len() > 1 { " — vérification des articles seulement (connexions non comptées)" } else { "" };
+        let role = if s.nzb_check && servers.len() > 1 { ", vérification des articles seulement (connexions non comptées)" } else { "" };
         on_line(&format!("  · {}{role}", s.describe_with(s.connections)));
     }
     Ok(Some(p))

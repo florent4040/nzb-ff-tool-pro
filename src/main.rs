@@ -309,7 +309,7 @@ fn deposit(cfg: &Config, rel: &str, idx: &str) {
             }
             Err(e) => match e.retry_after {
                 Some(secs) if attempt < 5 => {
-                    eprintln!("    {idx} : {} — nouvel essai dans {secs} s", e.message);
+                    eprintln!("    {idx} : {}, nouvel essai dans {secs} s", e.message);
                     thread::sleep(Duration::from_secs(secs));
                 }
                 _ => {

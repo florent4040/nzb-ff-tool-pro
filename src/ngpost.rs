@@ -688,8 +688,8 @@ fn par2_version_text(exe: &Path) -> Option<String> {
 
 /// Mesure, sur ce PC, chaque outil par2 trouvé : même fichier (512 Mo, contenu aléatoire,
 /// dans le dossier temporaire du post), même redondance (10 %), mêmes blocs (1 Mo), même
-/// mémoire. Le fichier et les par2 sont supprimés ensuite. Renvoie (outil, secondes —
-/// négatif : échec —, exécutable).
+/// mémoire. Le fichier et les par2 sont supprimés ensuite. Renvoie (outil, secondes,
+/// négatif : échec, exécutable).
 pub fn par2_bench(cfg: &Config, on_step: &mut dyn FnMut(&str)) -> Result<Vec<(String, f64, PathBuf)>, String> {
     // chaque exécutable une fois, appelé d'après ce qu'il est vraiment
     let mut tools: Vec<(String, PathBuf, bool)> = Vec::new();
@@ -760,7 +760,7 @@ pub fn par2_bench(cfg: &Config, on_step: &mut dyn FnMut(&str)) -> Result<Vec<(St
                     let _ = s.read_to_string(&mut e);
                 }
                 let why = e.lines().map(str::trim).filter(|l| !l.is_empty()).last().unwrap_or("code d'erreur").to_string();
-                out.push((format!("{label} — échec : {why}"), -1.0, exe.clone()));
+                out.push((format!("{label}, échec : {why}"), -1.0, exe.clone()));
                 continue;
             }
             out.push((label.clone(), secs, exe.clone()));
@@ -935,7 +935,7 @@ fn post_in_lots(
             }
         }
         let size: u64 = lot.iter().map(|x| x.1).sum();
-        on_line(&format!("— Lot {}/{n} : {} fichier(s), {}", k + 1, lot.len(), prep::human_size(size)));
+        on_line(&format!("Lot {}/{n} : {} fichier(s), {}", k + 1, lot.len(), prep::human_size(size)));
         let res = match err {
             Some(e) => Err(e),
             None => post_file(&sub, &ldir, &format!("{release}.lot{}", k + 1), on_line, &mut |p| {
@@ -1800,7 +1800,7 @@ pub fn post_file(cfg: &Config, video: &Path, release: &str, on_line: &mut dyn Fn
         }
         match (&f.added, f.ok) {
             (Some(g), _) => on_line(&format!("Groupe {g} ajouté : {} n'indexe aucun des autres groupes du post", f.idx)),
-            (None, false) => on_line(&format!("⚠ {} n'indexe aucun des groupes du post ({used}) : la release risque de ne pas y être trouvée{}", f.idx, if f.suggest.is_empty() { String::new() } else { format!(" — ses groupes adaptés : {}", f.suggest.iter().take(4).cloned().collect::<Vec<_>>().join(", ")) })),
+            (None, false) => on_line(&format!("⚠ {} n'indexe aucun des groupes du post ({used}) : la release risque de ne pas y être trouvée{}", f.idx, if f.suggest.is_empty() { String::new() } else { format!(", ses groupes adaptés : {}", f.suggest.iter().take(4).cloned().collect::<Vec<_>>().join(", ")) })),
             _ => {}
         }
     }
@@ -1937,7 +1937,7 @@ pub fn post_file(cfg: &Config, video: &Path, release: &str, on_line: &mut dyn Fn
             let _ = writeln!(f, "[{:02}:{:02}:{:02}.{ms:03}] {s}", l.hour, l.minute, l.second);
         }
     };
-    write_log(&format!("# {} — post de {release}", crate::APP_NAME));
+    write_log(&format!("# {}, post de {release}", crate::APP_NAME));
     write_log(&format!("# vidéo : {}", video.display()));
     let cmdline = command_line(&exe, &args);
     // réglages effectifs du post (journal détaillé ; toujours dans le fichier journal)
@@ -2289,7 +2289,7 @@ pub fn post_file(cfg: &Config, video: &Path, release: &str, on_line: &mut dyn Fn
         std::thread::sleep(Duration::from_millis(300));
         check = nzb_info(&produced);
     }
-    let log_note = if has_log { format!(" — journal : {}", log_path.display()) } else { String::new() };
+    let log_note = if has_log { format!(", journal : {}", log_path.display()) } else { String::new() };
     let why = tail.iter().rev().take(3).rev().cloned().collect::<Vec<_>>().join(" | ");
     let code = status.code().map(|c| c.to_string()).unwrap_or_else(|| "inconnu".into());
     // un NZB produit est toujours gardé : jamais perdu, même refusé
@@ -2298,7 +2298,7 @@ pub fn post_file(cfg: &Config, video: &Path, release: &str, on_line: &mut dyn Fn
         let _ = fs::remove_file(&kept);
         if move_path(produced, &kept).is_ok() {
             write_log(&format!("# NZB conservé : {}", kept.display()));
-            format!(" — NZB conservé : {}", kept.display())
+            format!(", NZB conservé : {}", kept.display())
         } else {
             String::new()
         }
@@ -3028,10 +3028,10 @@ pub fn deposit_for(cfg: &Config, i: &prep::IndexerCfg, api_on: bool, action: &st
         return Deposit { api: false, text: site(""), problem: None };
     }
     if let Some(p) = api_problem(i) {
-        return Deposit { api: false, text: site(&format!(" — {p}")), problem: Some(p) };
+        return Deposit { api: false, text: site(&format!(", {p}")), problem: Some(p) };
     }
     if !api_on {
-        return Deposit { api: false, text: site(" — dépôt par API désactivé pour ce traitement"), problem: None };
+        return Deposit { api: false, text: site(", dépôt par API désactivé pour ce traitement"), problem: None };
     }
     let _ = cfg;
     Deposit { api: true, text: format!("dépôt automatique par {how}, dès que le NZB est prêt"), problem: None }
@@ -3171,7 +3171,7 @@ pub fn api_upload(cfg: &Config, rel: &str, idx: &str) -> Result<String, crate::u
     let _ = crate::upload::take_trace();
     let started = std::time::Instant::now();
     let res = crate::upload::upload(icfg, rel, &dir);
-    let mut detail = vec![format!("Dépôt de {rel} sur {idx} ({mode}) — {cat}")];
+    let mut detail = vec![format!("Dépôt de {rel} sur {idx} ({mode}), {cat}")];
     detail.extend(deposit_summary(icfg, rel, &dir));
     detail.extend(crate::upload::take_trace());
     detail.push(format!("  durée totale : {:.1} s", started.elapsed().as_secs_f64()));
@@ -3202,15 +3202,15 @@ pub fn api_upload(cfg: &Config, rel: &str, idx: &str) -> Result<String, crate::u
         Ok(r) => match r.category.as_deref() {
             // même famille (2040 → 2340 « Movies - FR / HD ») : l'indexer précise, c'est normal
             Some(got) if !sent.is_empty() && sent != "-1" && got != sent && got.chars().next() == sent.chars().next() => {
-                warn = format!(" — envoyée en {}, classée par l'indexer en {}", icfg.cat_label(&sent), icfg.cat_label(got));
-                detail.push(format!("  catégorie attribuée par l'indexer : {} (envoyée : {}, précisée par l'indexer — langue, résolution…)", icfg.cat_label(got), icfg.cat_label(&sent)));
+                warn = format!(", envoyée en {}, classée par l'indexer en {}", icfg.cat_label(&sent), icfg.cat_label(got));
+                detail.push(format!("  catégorie attribuée par l'indexer : {} (envoyée : {}, précisée par l'indexer, langue, résolution…)", icfg.cat_label(got), icfg.cat_label(&sent)));
             }
             Some(got) if !sent.is_empty() && sent != "-1" && got != sent => {
                 warn = format!(" ⚠ l'indexer l'a classée en {} alors que {} a été envoyée", icfg.cat_label(got), icfg.cat_label(&sent));
-                detail.push(format!("  ⚠ catégorie attribuée par l'indexer : {} (envoyée : {}, autre famille) — vérifie les catégories de {idx} (Réglages → Indexers)", icfg.cat_label(got), icfg.cat_label(&sent)));
+                detail.push(format!("  ⚠ catégorie attribuée par l'indexer : {} (envoyée : {}, autre famille), vérifie les catégories de {idx} (Réglages → Indexers)", icfg.cat_label(got), icfg.cat_label(&sent)));
             }
             Some(got) => {
-                warn = format!(" — classée en {}", icfg.cat_label(got));
+                warn = format!(", classée en {}", icfg.cat_label(got));
                 detail.push(format!("  ✔ catégorie attribuée par l'indexer : {}", icfg.cat_label(got)));
             }
             None => detail.push("  (la réponse de l'indexer ne précise pas la catégorie attribuée)".into()),
@@ -3244,7 +3244,7 @@ pub fn deposit_summary(icfg: &prep::IndexerCfg, rel: &str, dir: &Path) -> Vec<St
     let api = icfg.mode == "newznab" || icfg.mode == "rest";
     out.push(format!("  Déposé sur {} ({kind}) :", icfg.name.trim()));
     let nzb = match nzb_summary(&f.nzb) {
-        Some((n, b)) => format!("{} ({}) — {n} fichier(s) postés, {}", prep::file_name(&f.nzb), sz(&f.nzb), prep::human_size(b)),
+        Some((n, b)) => format!("{} ({}), {n} fichier(s) postés, {}", prep::file_name(&f.nzb), sz(&f.nzb), prep::human_size(b)),
         None => format!("{} ({})", prep::file_name(&f.nzb), sz(&f.nzb)),
     };
     out.push(format!("    • NZB : {nzb}"));
@@ -3252,9 +3252,9 @@ pub fn deposit_summary(icfg: &prep::IndexerCfg, rel: &str, dir: &Path) -> Vec<St
         out.push(format!("    • Groupes Usenet (d'après le NZB) : {}", g.join(", ")));
     }
     out.push(match (&f.mediainfo, api, icfg.send_mi) {
-        (Some(m), true, true) => format!("    • MediaInfo : {} ({}) — champ « mediainfo »", prep::file_name(m), sz(m)),
+        (Some(m), true, true) => format!("    • MediaInfo : {} ({}), champ « mediainfo »", prep::file_name(m), sz(m)),
         (Some(m), true, false) => format!("    • MediaInfo : {} présent mais NON joint (champ « mediainfo » décoché dans les réglages de l'indexer)", prep::file_name(m)),
-        (Some(m), false, _) => format!("    • MediaInfo : {} ({}) — {{mediainfo}} de la commande", prep::file_name(m), sz(m)),
+        (Some(m), false, _) => format!("    • MediaInfo : {} ({}), {{mediainfo}} de la commande", prep::file_name(m), sz(m)),
         (None, _, _) => match &f.other_report {
             Some(o) => format!("    • MediaInfo : ⚠ seulement {} (pas en XML) : non joint", prep::file_name(o)),
             None => "    • MediaInfo : ✖ aucun rapport".to_string(),
@@ -3270,13 +3270,13 @@ pub fn deposit_summary(icfg: &prep::IndexerCfg, rel: &str, dir: &Path) -> Vec<St
         _ => "origine inconnue".into(),
     };
     out.push(match &f.nfo {
-        Some(n) => format!("    • NFO : {} ({}), {from} — champ « nfo »", prep::file_name(n), sz(n)),
+        Some(n) => format!("    • NFO : {} ({}), {from}, champ « nfo »", prep::file_name(n), sz(n)),
         None if origin == "non-envoye" => "    • NFO : NFO d'origine présent mais NON envoyé (« Envoyer le NFO d'origine » décoché)".to_string(),
         None => "    • NFO : aucun (pas de NFO d'origine, et « Créer un NFO » décoché)".to_string(),
     });
     if let Some(b) = &f.bdinfo {
         out.push(format!(
-            "    • BDInfo : {} ({}) — {}",
+            "    • BDInfo : {} ({}), {}",
             prep::file_name(b),
             sz(b),
             if !icfg.bdinfo_field.trim().is_empty() && api {
@@ -3425,7 +3425,7 @@ pub fn dupe_gate(cfg: &Config, rel: &str, video: &Path, on_line: &mut dyn FnMut(
     // uploadée à la main et notée sur un indexer visé : comptée présente, même sans recherche
     let marked = targets.iter().any(|t| crate::search::marked_any(&names, t).is_some());
     if searchable.is_empty() && !marked {
-        on_line(&format!("Présence sur les indexers : non vérifiée (aucune recherche réglée pour {} — Réglages → Indexers → Recherche)", targets.join(", ")));
+        on_line(&format!("Présence sur les indexers : non vérifiée (aucune recherche réglée pour {}, Réglages → Indexers → Recherche)", targets.join(", ")));
         return Ok(());
     }
     on_line(&format!("Présence sur les indexers : recherche de {} sur {}…", names.join(" / "), searchable.iter().map(|i| i.name.trim()).collect::<Vec<_>>().join(", ")));
@@ -3491,7 +3491,7 @@ pub fn groups_for(cfg: &Config, release: &str) -> (String, String) {
 
 /// Groupes d'un type de release : (groupes, type, d'où ils viennent). Groupes vides : ceux des
 /// options du post (ou de ngPost.conf). Une catégorie de contenu sans groupes reçoit ceux
-/// conseillés pour elle — jamais ceux des films.
+/// conseillés pour elle, jamais ceux des films.
 pub fn groups_kind(cfg: &Config, content: Option<(&str, &str)>, series: bool, release: &str) -> (String, String, String) {
     if let Some((key, name)) = content {
         let own = cfg.content_cats.iter().find(|c| c.key == key).map(|c| c.groups.trim().to_string()).unwrap_or_default();
@@ -4984,7 +4984,7 @@ mod tests {
         let _ = h2.join();
         assert!(e.contains("Incorrect user credentials") && !e.contains("CLE-SECRETE"), "{e}");
         assert!(p2.is_dir());
-        // doublon : l'indexer garde ce qu'il avait (catégorie comprise) — dit clairement
+        // doublon : l'indexer garde ce qu'il avait (catégorie comprise), dit clairement
         let (addr3, h3) = fake_newznab(r#"<error code="601" description="Duplicate NZB"/>"#);
         let mut cfg3 = cfg.clone();
         cfg3.indexers[0].api_url = format!("{addr3}/api");

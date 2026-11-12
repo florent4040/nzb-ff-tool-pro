@@ -444,10 +444,10 @@ impl Level {
 
 fn record_message(r: &Record) -> (Level, String) {
     match r.status {
-        Status::Sent if !r.reason.is_empty() => (Level::Warn, format!("Envoyé : {} — ⚠ {}", r.release, r.reason)),
+        Status::Sent if !r.reason.is_empty() => (Level::Warn, format!("Envoyé : {}, ⚠ {}", r.release, r.reason)),
         Status::Sent => (Level::Ok, format!("Envoyé : {}", r.release)),
-        Status::Quarantine => (Level::Warn, format!("Quarantaine : {} — {}", r.original, r.reason)),
-        Status::Failed => (Level::Err, format!("Échec : {} — {}", r.original, r.reason)),
+        Status::Quarantine => (Level::Warn, format!("Quarantaine : {}, {}", r.original, r.reason)),
+        Status::Failed => (Level::Err, format!("Échec : {}, {}", r.original, r.reason)),
     }
 }
 
@@ -877,14 +877,14 @@ fn mi_options(ui: &mut Ui, id: &str, fmt: &mut String, dest: &mut String, dir: &
 /// Affiche un rapport MediaInfo texte (sections, clé / valeur), filtrable.
 /// Aide : catégories Newznab les plus courantes.
 const NEWZNAB_HELP: &str = "Catégories Newznab courantes (chaque indexer peut avoir les siennes) :
-1000 Consoles — 1030 Wii, 1050 Xbox 360, 1080 PS3, 1110 3DS, 1130 Wii U, 1140 Xbox One, 1180 PS4
-2000 Films — 2030 SD, 2040 HD, 2045 UHD
-3000 Audio — 3010 MP3, 3030 Livres audio, 3040 Lossless (FLAC)
-4000 PC — 4010 0day / logiciels, 4020 ISO, 4030 Mac, 4050 Jeux, 4060 iOS, 4070 Android
-5000 TV — 5030 SD, 5040 HD, 5045 UHD, 5070 Anime
-6000 XXX — 6040 x264, 6045 UHD, 6060 Images
-7000 Livres — 7010 Magazines, 7020 Ebooks, 7030 BD / Comics
-8000 Autre — 8010 Divers";
+1000 Consoles : 1030 Wii, 1050 Xbox 360, 1080 PS3, 1110 3DS, 1130 Wii U, 1140 Xbox One, 1180 PS4
+2000 Films : 2030 SD, 2040 HD, 2045 UHD
+3000 Audio : 3010 MP3, 3030 Livres audio, 3040 Lossless (FLAC)
+4000 PC : 4010 0day / logiciels, 4020 ISO, 4030 Mac, 4050 Jeux, 4060 iOS, 4070 Android
+5000 TV : 5030 SD, 5040 HD, 5045 UHD, 5070 Anime
+6000 XXX : 6040 x264, 6045 UHD, 6060 Images
+7000 Livres : 7010 Magazines, 7020 Ebooks, 7030 BD / Comics
+8000 Autre : 8010 Divers";
 
 /// Texte en minuscules sans accents.
 fn fold(s: &str) -> String {
@@ -1065,7 +1065,7 @@ fn tree_rows(ui: &mut Ui, path: &str, n: &TreeNode, depth: usize, accent: Color3
         let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), ROW), Sense::click());
         let x = r.left() + (depth + 1) as f32 * STEP + 34.0;
         let col = if resp.hovered() { accent } else { pal().muted };
-        ui.painter().text(egui::pos2(x, r.center().y), Align2::LEFT_CENTER, format!("… et {} autre(s) fichier(s) ({}) — afficher", hidden.len(), prep::human_size(size)), fp(12.0), col);
+        ui.painter().text(egui::pos2(x, r.center().y), Align2::LEFT_CENTER, format!("… et {} autre(s) fichier(s) ({}), afficher", hidden.len(), prep::human_size(size)), fp(12.0), col);
         if resp.on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
             ui.ctx().data_mut(|d| d.insert_temp(more_id, true));
         }
@@ -1095,7 +1095,7 @@ fn request_preview(ui: &mut Ui, i: &prep::IndexerCfg, rest: bool) {
                 (crate::upload::nzbadd_args(i, &f, rel), i.api_key.trim().to_string())
             };
             let cat = crate::upload::category_for(i, rel, &f);
-            ui.label(RichText::new(format!("{label} « {rel} » — {}", crate::upload::category_label(&cat))).size(12.5).font(semi(12.5)).color(pal().text));
+            ui.label(RichText::new(format!("{label} « {rel} », {}", crate::upload::category_label(&cat))).size(12.5).font(semi(12.5)).color(pal().text));
             for l in crate::upload::describe_args(&args, &key) {
                 ui.add(egui::Label::new(RichText::new(l).monospace().size(11.5).color(pal().muted)).wrap());
             }
@@ -1126,7 +1126,7 @@ fn export_cats(i: &prep::IndexerCfg, fmt: &str) -> String {
             i.groups.iter().map(|g| js(g)).collect::<Vec<_>>().join(", ")
         ),
         _ => {
-            let mut o = format!("{} — catégories ({})\r\n", i.name.trim(), i.cat_list.len());
+            let mut o = format!("{}, catégories ({})\r\n", i.name.trim(), i.cat_list.len());
             for (id, n) in &i.cat_list {
                 o.push_str(&format!("{id}\t{n}\r\n"));
             }
@@ -1641,7 +1641,7 @@ fn dupe_verdict(cfg: &Config, rel: &str, names: &[String], res: &[crate::search:
     } else if cfg.dupe_check == "warn" {
         format!("{name} quand même (signaler seulement)")
     } else if all {
-        "ne sera pas postée (déjà présente partout) — « Poster quand même » proposé".into()
+        "ne sera pas postée (déjà présente partout), « Poster quand même » proposé".into()
     } else {
         format!("{name}, sauf pour {}", present.join(", "))
     };
@@ -1994,7 +1994,7 @@ fn group_rules_editor(ui: &mut Ui, k: usize, i: &mut prep::IndexerCfg, accent: C
 }
 
 /// « Ce qui est réglé » pour un indexer : recherche, envoi, catégories, groupes, identité
-/// réseau — d'un coup d'œil, chaque ligne verte quand elle est prête.
+/// réseau, d'un coup d'œil, chaque ligne verte quand elle est prête.
 fn indexer_summary(ui: &mut Ui, i: &prep::IndexerCfg) {
     let mut rows: Vec<(Option<bool>, &str, String)> = Vec::new();
     // recherche
@@ -2012,7 +2012,7 @@ fn indexer_summary(ui: &mut Ui, i: &prep::IndexerCfg) {
         "cmd" => (Some(i.has_api()), "commande personnalisée".into()),
         _ => (None, "à la main : la page d'upload s'ouvre avec le dossier du NZB".into()),
     };
-    let up_txt = if up.0 == Some(false) { format!("{} — incomplet (adresse ou clé manquante)", up.1) } else { up.1 };
+    let up_txt = if up.0 == Some(false) { format!("{}, incomplet (adresse ou clé manquante)", up.1) } else { up.1 };
     rows.push((up.0, "Envoi des NZB", up_txt));
     // catégories
     let filled = i.cat_map.iter().filter(|(_, v)| !v.trim().is_empty()).count();
@@ -2516,7 +2516,7 @@ fn cat_tools(ui: &mut Ui, k: usize, i: &mut prep::IndexerCfg, cats: &[(String, S
                 let n = list.len();
                 i.cat_list = list;
                 fill = true;
-                let ign = if skipped.is_empty() { String::new() } else { format!(" — {} ligne(s) sans numéro ignorée(s) : {}{}", skipped.len(), skipped.iter().take(6).map(|s| format!("« {} »", s.chars().take(40).collect::<String>())).collect::<Vec<_>>().join(", "), if skipped.len() > 6 { "…" } else { "" }) };
+                let ign = if skipped.is_empty() { String::new() } else { format!(", {} ligne(s) sans numéro ignorée(s) : {}{}", skipped.len(), skipped.iter().take(6).map(|s| format!("« {} »", s.chars().take(40).collect::<String>())).collect::<Vec<_>>().join(", "), if skipped.len() > 6 { "…" } else { "" }) };
                 ui.data_mut(|d| d.insert_temp(Id::new(("cat_import_report", k)), format!("{n} catégorie(s) lue(s) dans {}{ign}", prep::file_name(&p))));
             }
         }
@@ -3808,7 +3808,7 @@ pub struct App {
     /// Numéro de la recherche de présence du récapitulatif ouvert.
     recap_check: u64,
     /// Paires (release, indexer) trouvées déjà présentes, non déposées : (source, release,
-    /// indexers, MediaInfo, NFO) — « Déposer quand même ».
+    /// indexers, MediaInfo, NFO), « Déposer quand même ».
     z_skipped: Vec<(PathBuf, String, Vec<String>, Option<PathBuf>, Option<PathBuf>)>,
     cat_kick: Arc<AtomicBool>,
     /// Débit du client sur les dernières minutes (courbe).
@@ -4406,7 +4406,7 @@ impl App {
             mi_status: None,
             mi_busy: false,
         };
-        app.log(Level::Info, format!("{} {} démarré — {} entrée(s) d'historique", crate::APP_NAME, crate::VERSION, n));
+        app.log(Level::Info, format!("{} {} démarré, {} entrée(s) d'historique", crate::APP_NAME, crate::VERSION, n));
         // journaux de plus de 90 jours retirés (en arrière-plan)
         thread::spawn(|| {
             crate::logs::prune(90);
@@ -4576,16 +4576,16 @@ impl App {
             drop(busy);
             match &res {
                 Ok(p) => crate::notify::record(format!(
-                    "✔ Posté : {rel} — {} en {}{}{}",
+                    "✔ Posté : {rel}, {} en {}{}{}",
                     prep::human_size(p.bytes),
                     fmt_eta(p.secs as f64),
                     p.avg_bps.map(|b| format!(", {}", fmt_speed(b))).unwrap_or_default(),
-                    if p.info.groups.is_empty() { String::new() } else { format!(" — groupes : {}", p.info.groups.join(", ")) }
+                    if p.info.groups.is_empty() { String::new() } else { format!(", groupes : {}", p.info.groups.join(", ")) }
                 )),
                 Err(e) if e.contains(ngpost::POST_CANCELLED) => crate::notify::record(format!("⏹ Post arrêté : {rel}")),
                 // déjà noté par la vérification elle-même
                 Err(e) if e.contains(ngpost::POST_DUPE) => {}
-                Err(e) => crate::notify::record(format!("✖ Échec du post : {rel} — {e}")),
+                Err(e) => crate::notify::record(format!("✖ Échec du post : {rel}, {e}")),
             }
             // suite du post dans l'historique (même fenêtre cachée)
             match &res {
@@ -4676,9 +4676,9 @@ impl App {
             // résumé par e-mail : catégorie envoyée / attribuée, et en cas d'échec la réponse de l'indexer
             let reply = last_reply.lock().map(|mut l| std::mem::take(&mut *l)).unwrap_or_default();
             match &res {
-                Ok(m) => crate::notify::record(format!("✔ Déposée sur {idx} : {rel} — {m}{}", deposited.iter().map(|l| format!("\n        {l}")).collect::<String>())),
-                Err(e) if reply.is_empty() => crate::notify::record(format!("✖ Dépôt refusé par {idx} : {rel} — {e}")),
-                Err(e) => crate::notify::record(format!("✖ Dépôt refusé par {idx} : {rel} — {e}\n        réponse de l'indexer : {reply}")),
+                Ok(m) => crate::notify::record(format!("✔ Déposée sur {idx} : {rel}, {m}{}", deposited.iter().map(|l| format!("\n        {l}")).collect::<String>())),
+                Err(e) if reply.is_empty() => crate::notify::record(format!("✖ Dépôt refusé par {idx} : {rel}, {e}")),
+                Err(e) => crate::notify::record(format!("✖ Dépôt refusé par {idx} : {rel}, {e}\n        réponse de l'indexer : {reply}")),
             }
             match &res {
                 Ok(m) => crate::tray::notify(&format!("Déposée sur {idx}"), &format!("{rel} : {m}")),
@@ -4930,7 +4930,7 @@ impl App {
             let vid = egui::ViewportId::from_hash_of(("nzbff_log", pane));
             let size = self.log_win_size[pane].unwrap_or(vec2(920.0, 560.0));
             let builder = egui::ViewportBuilder::default()
-                .with_title(format!("{title} — {}", crate::APP_NAME))
+                .with_title(format!("{title} - {}", crate::APP_NAME))
                 .with_inner_size(size)
                 .with_min_inner_size([360.0, 200.0])
                 .with_resizable(true)
@@ -5069,7 +5069,7 @@ impl App {
                         }
                     }
                     Some((rel, Err(e))) => {
-                        banner(ui, pal().red, "✖", &format!("Dernier post en échec : {rel} — {e}"));
+                        banner(ui, pal().red, "✖", &format!("Dernier post en échec : {rel}, {e}"));
                     }
                     None => {
                         ui.label(RichText::new("Aucun post en cours.").color(pal().muted));
@@ -5731,7 +5731,7 @@ impl App {
                         self.toast(Level::Ok, format!("⬇ Téléchargement terminé : {name} ({detail})"));
                         self.dl_note(format!("✔ {name} téléchargé ({detail})"));
                     } else {
-                        self.toast(Level::Err, format!("Téléchargement en échec : {name} — {detail}"));
+                        self.toast(Level::Err, format!("Téléchargement en échec : {name}, {detail}"));
                         self.dl_note(format!("✖ {name} : {detail}"));
                     }
                 }
@@ -5968,7 +5968,7 @@ impl App {
                         Ok(m) if m.contains('⚠') => self.toast(Level::Warn, format!("{rel} → {idx} : {m}")),
                         Ok(m) => self.toast(Level::Ok, format!("{rel} déposée sur {idx} : {m}")),
                         Err(e) => {
-                            self.toast(Level::Err, format!("Dépôt de {rel} sur {idx} impossible : {e} — elle reste dans « _À uploader »"));
+                            self.toast(Level::Err, format!("Dépôt de {rel} sur {idx} impossible : {e}, elle reste dans « _À uploader »"));
                             // refus compris (405, 404, clé, champ…) : correction proposée
                             if self.popup.is_none() {
                                 self.deposit_fix_popup(&rel, &idx, &e);
@@ -5978,7 +5978,7 @@ impl App {
                     self.monitor_kick.store(true, Ordering::Relaxed);
                 }
                 Ev::ApiWait(rel, idx, secs, why, n) => {
-                    self.toast(Level::Warn, format!("{rel} → {idx} : {why} — nouvel essai dans {} (essai {n}/5)", fmt_duration(secs)));
+                    self.toast(Level::Warn, format!("{rel} → {idx} : {why}, nouvel essai dans {} (essai {n}/5)", fmt_duration(secs)));
                 }
                 Ev::RecapChecked(id, res) => {
                     if id != self.recap_check {
@@ -6000,7 +6000,7 @@ impl App {
                             }
                         }
                         for w in warn {
-                            p.issues.push(PopIssue { blocking: false, text: format!("Déjà sur un indexer — {w}"), fix: None });
+                            p.issues.push(PopIssue { blocking: false, text: format!("Déjà sur un indexer, {w}"), fix: None });
                         }
                         if !p.issues.is_empty() && p.tone == Tone::Normal {
                             p.tone = Tone::Warn;
@@ -6008,7 +6008,7 @@ impl App {
                     }
                     for (rel, names, look) in &res {
                         let (t, tone) = dupe_verdict(&cfg, rel, names, look);
-                        self.log(if tone == Tone::Warn { Level::Warn } else { Level::Info }, format!("Récapitulatif — {rel} (cherchée sous : {}) : {t}", names.join(" / ")));
+                        self.log(if tone == Tone::Warn { Level::Warn } else { Level::Info }, format!("Récapitulatif, {rel} (cherchée sous : {}) : {t}", names.join(" / ")));
                     }
                 }
                 Ev::ZChecked(found) => {
@@ -6088,7 +6088,7 @@ impl App {
                             match self.cfg.indexers.iter_mut().find(|i| i.name.trim() == name) {
                                 Some(i) if !(imp.requests.is_empty() && imp.profile.is_none() && imp.caps.is_none() && imp.kind.is_empty()) => {
                                     let done = crate::apidef::apply(&mut i.api, &imp, &url);
-                                    (true, format!("{url} — {} : {}", imp.format, if done.is_empty() { "rien de nouveau".to_string() } else { done.join(" · ") }))
+                                    (true, format!("{url}, {} : {}", imp.format, if done.is_empty() { "rien de nouveau".to_string() } else { done.join(" · ") }))
                                 }
                                 _ => (false, format!("{url} : {}", if imp.notes.is_empty() { "rien de reconnu".to_string() } else { imp.notes.join(" ; ") })),
                             }
@@ -6315,7 +6315,7 @@ impl App {
                     t.probe = Some(hits);
                     match best {
                         Some(u) => self.toast(Level::Ok, format!("{name} : adresse d'envoi probable : {u}")),
-                        None => self.toast(Level::Warn, format!("{name} : aucune adresse d'envoi trouvée — colle sa documentation dans « Lire sa documentation »")),
+                        None => self.toast(Level::Warn, format!("{name} : aucune adresse d'envoi trouvée, colle sa documentation dans « Lire sa documentation »")),
                     }
                 }
                 Ev::ApiDetail(rel, idx, lines) => {
@@ -6390,7 +6390,7 @@ impl App {
                         }
                         Err(e) => {
                             self.post_log.push(format!("✖ {e}"));
-                            let hint = if ngpost::is_space_error(e) { " — solutions proposées en haut de la page" } else { "" };
+                            let hint = if ngpost::is_space_error(e) { ", solutions proposées en haut de la page" } else { "" };
                             self.toast(Level::Err, format!("Post de {release} : {e}{hint}"));
                         }
                     }
@@ -6732,7 +6732,7 @@ impl App {
         let mut remove_provider: Option<usize> = None;
         let mut add_provider = false;
         card(ui, |ui| {
-            card_title(ui, "Notification par e-mail", "Un e-mail quand tous les traitements sont terminés (copies, posts, dépôts), avec leur résumé — même fenêtre fermée");
+            card_title(ui, "Notification par e-mail", "Un e-mail quand tous les traitements sont terminés (copies, posts, dépôts), avec leur résumé, même fenêtre fermée");
             toggle(ui, &mut self.cfg.mail_enabled, "M'envoyer un e-mail à la fin des traitements", "Envoyé quand plus rien n'est en cours depuis 45 secondes (les vidéos de l'inbox qui s'enchaînent ne donnent qu'un e-mail)", accent);
             if !self.cfg.mail_enabled {
                 return;
@@ -6814,7 +6814,7 @@ impl App {
             ui.add_space(10.0);
             ui.label(RichText::new("CONTENU DE L'E-MAIL").font(semi(11.0)).color(pal().faint));
             ui.add_space(2.0);
-            toggle(ui, &mut self.cfg.mail_html, "E-mail en couleur", "Bandeau rouge s'il y a une erreur, jaune pour de simples alertes sans conséquence, vert quand tout est bon — chaque ligne colorée selon son résultat (le texte brut reste joint pour les messageries sans HTML)", accent);
+            toggle(ui, &mut self.cfg.mail_html, "E-mail en couleur", "Bandeau rouge s'il y a une erreur, jaune pour de simples alertes sans conséquence, vert quand tout est bon, chaque ligne colorée selon son résultat (le texte brut reste joint pour les messageries sans HTML)", accent);
             if self.cfg.mail_html {
                 ui.horizontal(|ui| {
                     for (c, t) in [(Color32::from_rgb(0xf0, 0x44, 0x38), "erreur"), (Color32::from_rgb(0xf7, 0x90, 0x09), "alerte"), (Color32::from_rgb(0x12, 0xb7, 0x6a), "tout est bon")] {
@@ -6926,6 +6926,23 @@ impl App {
     /// Champ de recherche en haut des réglages, et sections trouvées.
     fn settings_search(&mut self, ui: &mut Ui, accent: Color32) {
         let id = egui::Id::new("settings_search");
+        // section ouverte depuis une autre page (« Régler ») : son nom, et de quoi tout revoir
+        if let Some(sec) = self.set_query.strip_prefix('§').map(|x| x.trim().to_string()) {
+            Frame::new().fill(pal().card).stroke(Stroke::new(1.0_f32, accent)).corner_radius(cr(12)).inner_margin(Margin::symmetric(12, 8)).show(ui, |ui| {
+                ui.set_width(ui.available_width());
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new("Section").size(13.0).color(pal().muted));
+                    ui.label(RichText::new(&sec).font(semi(15.0)).color(pal().text));
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        if btn_small(ui, "Tous les réglages").clicked() {
+                            self.set_query.clear();
+                        }
+                    });
+                });
+            });
+            ui.add_space(8.0);
+            return;
+        }
         Frame::new().fill(pal().card).stroke(Stroke::new(1.0_f32, if self.set_query.trim().is_empty() { pal().border } else { accent })).corner_radius(cr(12)).inner_margin(Margin::symmetric(12, 6)).show(ui, |ui| {
             ui.set_width(ui.available_width());
             ui.horizontal(|ui| {
@@ -6933,7 +6950,7 @@ impl App {
                 let w = ui.available_width() - if self.set_query.is_empty() { 0.0 } else { 34.0 };
                 ui.add_sized(
                     [w, 30.0],
-                    egui::TextEdit::singleline(&mut self.set_query).id(id).frame(false).font(egui::FontId::proportional(15.0)).hint_text("Rechercher un réglage (ex. latence, mot de passe, thème, par2, doublon…)  —  Ctrl+F"),
+                    egui::TextEdit::singleline(&mut self.set_query).id(id).frame(false).font(egui::FontId::proportional(15.0)).hint_text("Rechercher un réglage (ex. latence, mot de passe, thème, par2, doublon…)   ·   Ctrl+F"),
                 );
                 if !self.set_query.is_empty() && ui.add(egui::Button::new(RichText::new("×").color(pal().muted)).frame(false)).on_hover_text("Effacer (Échap)").clicked() {
                     self.set_query.clear();
@@ -7450,7 +7467,7 @@ impl App {
                     ui.label(RichText::new("Contenu : tous les réglages (dossiers, NgPost, indexers et clés API, serveurs Usenet, e-mail, séries, thème…), l'historique et les statistiques.").size(12.0).color(pal().muted));
                     let changed: Vec<String> = files.iter().map(|(l, t)| format!("{l} : {}", history::format_ts(*t))).collect();
                     if !changed.is_empty() {
-                        ui.label(RichText::new(format!("Dernière modification copiée — {}", changed.join("   ·   "))).size(12.0).color(pal().faint));
+                        ui.label(RichText::new(format!("Dernière modification copiée, {}", changed.join("   ·   "))).size(12.0).color(pal().faint));
                     }
                     if let (Some(first), Some(last)) = (dated.first(), dated.last()) {
                         let day = |n: &str| n.trim_start_matches("nzbff-").trim_end_matches(".conf").split('-').rev().collect::<Vec<_>>().join("/");
@@ -7934,7 +7951,7 @@ impl App {
                 continue;
             }
             let res: Result<(), String> = match &dup {
-                Some(d) => Err(format!("{d} — décoche « Refuser les doublons » ou renomme le .nzb pour le reprendre")),
+                Some(d) => Err(format!("{d}, décoche « Refuser les doublons » ou renomme le .nzb pour le reprendre")),
                 None => self.nzb_start_route(&nzb, &route, notify),
             };
             match res {
@@ -9337,7 +9354,7 @@ impl App {
             for (f, size) in &ws.pending {
                 ui.horizontal(|ui| {
                     ui.spinner();
-                    ui.label(RichText::new(format!("arrive : {f} ({}) — pris dès qu'il a fini d'être écrit", prep::human_size(*size))).size(12.0).color(pal().text));
+                    ui.label(RichText::new(format!("arrive : {f} ({}), pris dès qu'il a fini d'être écrit", prep::human_size(*size))).size(12.0).color(pal().text));
                 });
             }
             if self.dl_watch_log.is_empty() {
@@ -9617,7 +9634,7 @@ impl App {
             ("Destination".into(), if r.dest.is_none() { format!("dossier de sortie : {}", if c.ngpost_dir.trim().is_empty() { "non réglé" } else { c.ngpost_dir.trim() }) } else { r.dest_label.clone() }, Tone::Normal),
         ];
         if post {
-            rows.push(("Après le post".into(), format!("{} — seulement si le NZB est produit et vérifié", prep::POST_AFTER.iter().find(|x| x.0 == c.post_after).map(|x| x.1.to_string()).unwrap_or_else(|| c.post_after.clone())), Tone::Normal));
+            rows.push(("Après le post".into(), format!("{}, seulement si le NZB est produit et vérifié", prep::POST_AFTER.iter().find(|x| x.0 == c.post_after).map(|x| x.1.to_string()).unwrap_or_else(|| c.post_after.clone())), Tone::Normal));
             rows.push(("Si le post échoue".into(), "rien n'est supprimé ni déplacé : la vidéo reste dans la destination, l'échec est noté dans l'historique (« Reposter » d'un clic)".into(), Tone::Good));
             if c.ng_compress || c.ng_par2 {
                 let t = ngpost::tmp_dir(c, conf.as_ref());
@@ -9669,21 +9686,21 @@ impl App {
                 if !seen.iter().any(|(k, _)| *k == kind) {
                     seen.push((kind.clone(), g.clone()));
                     let wrong = content.is_some() && ["alt.binaries.movies", "alt.binaries.moovee", "alt.binaries.teevee", "alt.binaries.hdtv"].iter().any(|m| g.split(',').any(|x| x.trim() == *m));
-                    rows.push((if r.items.len() > 1 || content.is_some() { format!("Groupes · {kind}") } else { "Groupes".into() }, format!("{g} — {from}"), if wrong { Tone::Warn } else { Tone::Normal }));
+                    rows.push((if r.items.len() > 1 || content.is_some() { format!("Groupes · {kind}") } else { "Groupes".into() }, format!("{g}, {from}"), if wrong { Tone::Warn } else { Tone::Normal }));
                     // groupes indexés par chaque indexer visé (lus dans ses capacités)
                     if post {
                         let fam = ngpost::group_family(content, r.series, &rel);
                         let (_, fits) = ngpost::fit_groups(c, &g, fam, &r.targets, &rel, cat.as_ref().map(|x| (x.key.clone(), x.newznab.clone())));
                         for f in fits {
                             if let Some((cid, gg)) = &f.rule {
-                                rows.push((format!("Groupes · {}", f.idx), format!("{gg} — règle de sa catégorie {cid}{}", if f.added.is_some() { ", ajoutés au post" } else { ", déjà dans le post" }), Tone::Good));
+                                rows.push((format!("Groupes · {}", f.idx), format!("{gg}, règle de sa catégorie {cid}{}", if f.added.is_some() { ", ajoutés au post" } else { ", déjà dans le post" }), Tone::Good));
                                 continue;
                             }
                             let (txt, tone) = match (&f.added, f.ok) {
                                 (Some(a), _) => (format!("{a} ajouté au post : {} n'indexe pas les autres", f.idx), Tone::Good),
                                 (None, true) => (format!("{} indexe ces groupes", f.idx), Tone::Good),
                                 (None, false) => (
-                                    format!("{} n'indexe aucun de ces groupes : la release risque de ne pas y être trouvée{}", f.idx, if f.suggest.is_empty() { " (aucun de ses groupes ne convient à ce contenu)".to_string() } else { format!(" — ses groupes adaptés : {}", f.suggest.iter().take(3).cloned().collect::<Vec<_>>().join(", ")) }),
+                                    format!("{} n'indexe aucun de ces groupes : la release risque de ne pas y être trouvée{}", f.idx, if f.suggest.is_empty() { " (aucun de ses groupes ne convient à ce contenu)".to_string() } else { format!(", ses groupes adaptés : {}", f.suggest.iter().take(3).cloned().collect::<Vec<_>>().join(", ")) }),
                                     Tone::Warn,
                                 ),
                             };
@@ -9726,7 +9743,7 @@ impl App {
                 let unknown = i.cat_list.is_empty();
                 if all_same {
                     let cat = cats.first().map(|c| c.1.clone()).unwrap_or_default();
-                    rows.push(("   catégorie".into(), format!("{}{}{}", label(&cat), if forced { " — choisie pour ce traitement" } else { "" }, if unknown && !cat.is_empty() { " (liste de l'indexer inconnue)" } else { "" }), if forced { Tone::Good } else { Tone::Normal }));
+                    rows.push(("   catégorie".into(), format!("{}{}{}", label(&cat), if forced { ", choisie pour ce traitement" } else { "" }, if unknown && !cat.is_empty() { " (liste de l'indexer inconnue)" } else { "" }), if forced { Tone::Good } else { Tone::Normal }));
                 } else {
                     for (rel, cat) in cats.iter().take(8) {
                         rows.push((format!("   {rel}"), format!("catégorie {}", label(cat)), Tone::Normal));
@@ -9789,7 +9806,7 @@ impl App {
         let blocking = issues.iter().any(|i| i.blocking);
         Popup {
             icon: "📋",
-            title: format!("Récapitulatif — {}", r.what),
+            title: format!("Récapitulatif, {}", r.what),
             intro: if blocking { "Un point bloque le lancement : corrige-le, puis relance.".into() } else { "Vérifie ce qui va être fait, puis lance. Rien n'a encore été touché.".into() },
             tone: if blocking { Tone::Bad } else if issues.is_empty() { Tone::Normal } else { Tone::Warn },
             blocks,
@@ -10162,7 +10179,7 @@ impl App {
                 });
                 ui.add_space(12.0);
                 if is_recap {
-                    ui.checkbox(&mut mute, "Ne plus afficher le récapitulatif (les points bloquants restent signalés) — Réglages → Comportement");
+                    ui.checkbox(&mut mute, "Ne plus afficher le récapitulatif (les points bloquants restent signalés), Réglages → Comportement");
                     ui.add_space(6.0);
                 }
                 ui.horizontal(|ui| {
@@ -10813,7 +10830,7 @@ impl App {
                 ui.set_width(ui.available_width());
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("✏ Ma requête").font(semi(13.5)).color(pal().text));
-                    ui.label(RichText::new("une adresse, « POST https://… », ou une commande curl de la doc — {key} pour la clé, {release} pour le nom cherché").size(12.0).color(pal().muted));
+                    ui.label(RichText::new("une adresse, « POST https://… », ou une commande curl de la doc, {key} pour la clé, {release} pour le nom cherché").size(12.0).color(pal().muted));
                 });
                 ui.add(
                     egui::TextEdit::singleline(&mut t.free)
@@ -11000,7 +11017,7 @@ impl App {
                                     let shown = p.choices.iter().find(|c| c.0 == *v).map(|c| format!("{} · {}", c.0, c.1)).unwrap_or_else(|| if v.is_empty() { "—".into() } else { v.clone() });
                                     ui.horizontal(|ui| {
                                         egui::ComboBox::from_id_salt(("exp_choice", k, p.name.clone())).width(260.0).selected_text(shown).show_ui(ui, |ui| {
-                                            if ui.selectable_label(v.is_empty(), "— (non envoyé)").clicked() {
+                                            if ui.selectable_label(v.is_empty(), "(non envoyé)").clicked() {
                                                 v.clear();
                                             }
                                             for (cv, cl) in &p.choices {
@@ -11143,7 +11160,7 @@ impl App {
                         ui.add_space(4.0);
                         Frame::new().fill(pal().card).corner_radius(cr(8)).inner_margin(Margin::same(10)).show(ui, |ui| {
                             ui.set_width(ui.available_width());
-                            ui.label(RichText::new(format!("CAPACITÉS{}", if c.title.is_empty() { String::new() } else { format!(" — {}", c.title) })).font(semi(11.0)).color(pal().faint));
+                            ui.label(RichText::new(format!("CAPACITÉS{}", if c.title.is_empty() { String::new() } else { format!(", {}", c.title) })).font(semi(11.0)).color(pal().faint));
                             if c.limit_max > 0 {
                                 ui.label(RichText::new(format!("Résultats par requête : {} par défaut, {} au plus", c.limit_default, c.limit_max)).size(12.5).color(pal().text));
                             }
@@ -11172,7 +11189,7 @@ impl App {
                 t.note = Some((false, format!("{from} : {}", imp.notes.join(" ; "))));
             } else {
                 let done = apidef::apply(&mut prof, &imp, &from);
-                t.note = Some((true, format!("{from} — {} : {}", imp.format, if done.is_empty() { "rien de nouveau".to_string() } else { done.join(" · ") })));
+                t.note = Some((true, format!("{from}, {} : {}", imp.format, if done.is_empty() { "rien de nouveau".to_string() } else { done.join(" · ") })));
                 t.section = if prof.requests.iter().any(|r| r.origin == "import") { 1 } else { t.section };
             }
             t.import_open = false;
@@ -11483,7 +11500,7 @@ impl App {
             if fmt != "html" && fmt != "text" {
                 for (lbl, f) in [("Titre", &mut r.resp.title), ("Taille", &mut r.resp.size), ("Lien", &mut r.resp.link), ("Identifiant", &mut r.resp.id), ("Date", &mut r.resp.date), ("Erreur", &mut r.resp.error)] {
                     ui.label(RichText::new(lbl).color(pal().text));
-                    ui.add_sized([520.0, 24.0], egui::TextEdit::singleline(f).font(egui::TextStyle::Monospace).hint_text(format!("vide : automatique — {h_field}")));
+                    ui.add_sized([520.0, 24.0], egui::TextEdit::singleline(f).font(egui::TextStyle::Monospace).hint_text(format!("vide : automatique, {h_field}")));
                     ui.end_row();
                 }
             }
@@ -12298,7 +12315,7 @@ impl App {
 
     fn page_reports(&mut self, ui: &mut Ui) {
         let accent = self.accent();
-        page_header(ui, "Rapports", "NFO, MediaInfo et BDInfo seuls — d'un fichier, d'un dossier, d'un disque ou d'un NZB — sans renommer, déplacer ni poster", |_| {});
+        page_header(ui, "Rapports", "NFO, MediaInfo et BDInfo seuls, d'un fichier, d'un dossier, d'un disque ou d'un NZB, sans renommer, déplacer ni poster", |_| {});
         let mut add: Vec<PathBuf> = Vec::new();
         // ---------------------------------------------------------------- ce qu'il faut créer
         card(ui, |ui| {
@@ -12357,7 +12374,7 @@ impl App {
                     add.push(d);
                 }
             }
-            if btn_small(ui, "📄 NZB (téléchargé d'abord)…").on_hover_text("Le NZB est confié à ton client (SABnzbd ou NZBGet) ; une fois téléchargé, seuls les rapports cochés sont créés — rien n'est renommé ni reposté").clicked() {
+            if btn_small(ui, "📄 NZB (téléchargé d'abord)…").on_hover_text("Le NZB est confié à ton client (SABnzbd ou NZBGet) ; une fois téléchargé, seuls les rapports cochés sont créés, rien n'est renommé ni reposté").clicked() {
                 if let Some(v) = rfd::FileDialog::new().add_filter("NZB", &["nzb"]).pick_files() {
                     add.extend(v);
                 }
@@ -12628,7 +12645,7 @@ impl App {
                             let mut rp = n.mode == "repost";
                             if active.is_empty() {
                                 ui.add_enabled(false, egui::Button::new(RichText::new("🔁 Télécharger puis reposter").size(12.0))).on_disabled_hover_text("Aucun indexer actif (Réglages → Indexers)");
-                            } else if chip_toggle(ui, &mut rp, "🔁 Télécharger puis reposter", "Téléchargé, traité (nom, MediaInfo, NFO), posté avec NgPost puis déposé sur les indexers choisis — jamais celui d'origine", accent) {
+                            } else if chip_toggle(ui, &mut rp, "🔁 Télécharger puis reposter", "Téléchargé, traité (nom, MediaInfo, NFO), posté avec NgPost puis déposé sur les indexers choisis, jamais celui d'origine", accent) {
                                 n.mode = if rp { "repost".into() } else { String::new() };
                             }
                             let mut rep = n.mode == "reports";
@@ -12767,7 +12784,7 @@ impl App {
                                 _ => "celui du téléchargement ou créé",
                             },
                             targets.join(", "),
-                            if src.is_empty() { String::new() } else { format!(" — jamais sur {src}") },
+                            if src.is_empty() { String::new() } else { format!(", jamais sur {src}") },
                             if n.done.is_none() && !n.auto { " ; repost lancé d'un clic sur « Reposter »" } else { "" }
                         ),
                     };
@@ -12938,7 +12955,7 @@ impl App {
                             history::format_relative(d.completed),
                             d.status,
                             if d.cat.is_empty() { String::new() } else { format!(" · {}", d.cat) },
-                            if d.fail.is_empty() { String::new() } else { format!(" — {}", d.fail) }
+                            if d.fail.is_empty() { String::new() } else { format!(", {}", d.fail) }
                         ))
                         .size(11.5)
                         .color(pal().muted),
@@ -13709,7 +13726,7 @@ impl App {
     fn doc_window(&mut self, ctx: &egui::Context) {
         let Some(d) = self.doc_edit.as_mut() else { return };
         let (mut open, mut save, mut reset, mut tpl) = (true, false, false, false);
-        let title = format!("{} — pour ce traitement", DOC_NAMES[d.kind as usize]);
+        let title = format!("{}, pour ce traitement", DOC_NAMES[d.kind as usize]);
         egui::Window::new(RichText::new(title).font(semi(15.0)).color(pal().text))
             .id(Id::new("doc_edit"))
             .open(&mut open)
@@ -14007,7 +14024,7 @@ impl App {
                 ui,
                 pal().blue,
                 "ℹ",
-                "Un nom de release déjà présent (nom du fichier, titre MKV ou dossier) est repris. Sinon le nom est construit au format des indexers : Titre.Année.FRENCH.1080p.Source.Codec — une source introuvable n'est jamais inventée, elle est omise. Chaque élément reste modifiable.",
+                "Un nom de release déjà présent (nom du fichier, titre MKV ou dossier) est repris. Sinon le nom est construit au format des indexers : Titre.Année.FRENCH.1080p.Source.Codec, une source introuvable n'est jamais inventée, elle est omise. Chaque élément reste modifiable.",
             );
             return;
         }
@@ -14427,7 +14444,7 @@ impl App {
                         prep::human_size(size),
                         d.display(),
                         free.map(prep::human_size).unwrap_or_else(|| "?".into()),
-                        if ok { String::new() } else { " — choisis une autre destination".into() }
+                        if ok { String::new() } else { ", choisis une autre destination".into() }
                     );
                     ui.label(RichText::new(txt).size(12.5).color(if ok { pal().text } else { pal().red }));
                 }
@@ -14485,7 +14502,7 @@ impl App {
             _ => self.c_force_dup,
         };
         if forced {
-            banner(ui, pal().blue, "ℹ", &format!("{why} — envoi autorisé quand même pour ce traitement."));
+            banner(ui, pal().blue, "ℹ", &format!("{why}, envoi autorisé quand même pour ce traitement."));
             return;
         }
         let mut force = false;
@@ -14738,7 +14755,7 @@ impl App {
 
     /// Résumé des copies en cours, dans la barre latérale.
     /// Type de la release (FILM, SÉRIE, catégorie de contenu) en gros, et catégorie qui sera
-    /// envoyée à chaque indexer visé — avant de lancer quoi que ce soit.
+    /// envoyée à chaque indexer visé, avant de lancer quoi que ce soit.
     #[allow(clippy::too_many_arguments)]
     fn kind_banner(&mut self, ui: &mut Ui, k: usize, release: &str, series: bool, content: Option<&crate::content::Category>, action: &str, targets: &[String], accent: Color32) {
         let (icon, kind) = match content {
@@ -14847,7 +14864,7 @@ impl App {
                 (Some((c, g)), _, _) => (format!("    {} : {g} (règle de sa catégorie {c})", f.idx), pal().green),
                 (None, Some(a), _) => (format!("    {} : {a} ajouté (il n'indexe pas les autres)", f.idx), pal().green),
                 (None, None, true) => (format!("    {} : indexe ces groupes ✔", f.idx), pal().faint),
-                (None, None, false) => (format!("    ⚠ {} n'indexe aucun de ces groupes{}", f.idx, if f.suggest.is_empty() { String::new() } else { format!(" — adaptés : {}", f.suggest.iter().take(3).cloned().collect::<Vec<_>>().join(", ")) }), pal().orange),
+                (None, None, false) => (format!("    ⚠ {} n'indexe aucun de ces groupes{}", f.idx, if f.suggest.is_empty() { String::new() } else { format!(", adaptés : {}", f.suggest.iter().take(3).cloned().collect::<Vec<_>>().join(", ")) }), pal().orange),
             };
             ui.label(RichText::new(txt).size(12.0).color(col));
         }
@@ -15572,7 +15589,7 @@ impl App {
             ui.label(RichText::new(format!("Post : {how}.")).size(12.5).color(pal().muted));
             if self.c_action != "rename" {
                 let (g, from) = ngpost::groups_used(&self.cfg, self.ngconf.as_ref(), Some((cat.key.as_str(), cat.name.as_str())), false, &name);
-                ui.add(egui::Label::new(RichText::new(format!("Groupes Usenet : {g} — {from}.")).size(12.5).color(pal().muted)).wrap());
+                ui.add(egui::Label::new(RichText::new(format!("Groupes Usenet : {g}, {from}.")).size(12.5).color(pal().muted)).wrap());
             }
             let nested = self.c_scan.as_ref().map(|(_, _, l, _)| l.iter().any(|(r, _)| r.contains(['/', '\\']))).unwrap_or(false);
             if !compress && nested {
@@ -15662,7 +15679,7 @@ impl App {
                     }
                 });
             }
-            // ---- rapports : MediaInfo, BDInfo (Blu-ray), NFO — vus avant le dépôt
+            // ---- rapports : MediaInfo, BDInfo (Blu-ray), NFO, vus avant le dépôt
             let is_bd = self.c_disc.as_ref().map(|d| d.0.starts_with("Blu-ray")).unwrap_or(false);
             if cat.mediainfo || self.c_nfo.is_some() || is_bd {
                 ui.add_space(12.0);
@@ -17531,10 +17548,10 @@ impl App {
         let l = history::local_time(prep::now_secs());
         let name = format!("nzbff-journaux-{:04}-{:02}-{:02}_{:02}h{:02}.zip", l.year, l.month, l.day, l.hour, l.minute);
         let Some(dest) = rfd::FileDialog::new().set_title("Exporter les journaux").set_file_name(&name).add_filter("Archive ZIP", &["zip"]).save_file() else { return };
-        let session = format!("{}\n\n— Journal NgPost de la session —\n{}", self.journal_text(), self.post_log.join("\n"));
+        let session = format!("{}\n\n=== Journal NgPost de la session ===\n{}", self.journal_text(), self.post_log.join("\n"));
         match crate::logs::export_zip(&dest, &session, 30) {
             Ok((n, size)) => {
-                self.toast(Level::Ok, format!("Journaux exportés : {} ({n} fichier(s), {}) — mots de passe et clés masqués", dest.display(), prep::human_size(size)));
+                self.toast(Level::Ok, format!("Journaux exportés : {} ({n} fichier(s), {}), mots de passe et clés masqués", dest.display(), prep::human_size(size)));
                 prep::reveal(&dest);
             }
             Err(e) => self.toast(Level::Err, format!("Export des journaux : {e}")),
@@ -17992,7 +18009,7 @@ impl App {
                     }
                     ui.add_space(8.0);
                     ui.label(RichText::new("Envoi à NgPost").font(semi(13.5)).color(pal().text));
-                    ui.radio_value(&mut self.cfg.post_mode, "cli".to_string(), RichText::new("L'application poste elle-même chaque vidéo avec NgPost (ligne de commande) — recommandé").color(pal().text));
+                    ui.radio_value(&mut self.cfg.post_mode, "cli".to_string(), RichText::new("L'application poste elle-même chaque vidéo avec NgPost (ligne de commande), recommandé").color(pal().text));
                     ui.radio_value(&mut self.cfg.post_mode, "watch".to_string(), RichText::new("Déposer la vidéo dans le dossier surveillé par NgPost (interface, « Surveiller dossier »)").color(pal().text));
                     ui.add_space(4.0);
                     if self.cfg.post_mode == "cli" {
@@ -18175,8 +18192,8 @@ impl App {
                             ui.label(RichText::new(format!("Dépôt du NZB sur {}", i.name)).font(semi(14.5)).color(pal().text));
                             ui.add_space(4.0);
                             ui.radio_value(&mut i.mode, "web".to_string(), RichText::new("À la main : l'application ouvre la page d'upload et le dossier du NZB").color(pal().text));
-                            ui.radio_value(&mut i.mode, "newznab".to_string(), RichText::new("Automatique par l'API Newznab (t=nzbadd, à la même adresse que la recherche) — la plupart des indexers").color(pal().text));
-                            ui.radio_value(&mut i.mode, "rest".to_string(), RichText::new("Automatique par une adresse d'envoi à part (ex. /v1/upload) — la recherche reste sur l'API Newznab").color(pal().text))
+                            ui.radio_value(&mut i.mode, "newznab".to_string(), RichText::new("Automatique par l'API Newznab (t=nzbadd, à la même adresse que la recherche), la plupart des indexers").color(pal().text));
+                            ui.radio_value(&mut i.mode, "rest".to_string(), RichText::new("Automatique par une adresse d'envoi à part (ex. /v1/upload), la recherche reste sur l'API Newznab").color(pal().text))
                                 .on_hover_text("Pour les indexers dont l'API de recherche est /api mais qui reçoivent les NZB ailleurs (POST multipart : file, nfo, mediainfo, cat…). La recherche avant le post, la page Recherche et les catégories continuent de passer par l'API Newznab.");
                             ui.radio_value(&mut i.mode, "cmd".to_string(), RichText::new("Automatique par commande personnalisée (toute autre API, avec curl)").color(pal().text));
                             ui.add_space(8.0);
@@ -18437,8 +18454,8 @@ impl App {
                         for (k, i) in self.cfg.indexers.iter().enumerate().filter(|(_, i)| i.active) {
                             ui.horizontal(|ui| {
                                 match crate::search::method(i) {
-                                    Some(m) => ui.label(RichText::new(format!("✔ {} — par {m}", i.name.trim())).size(12.5).color(pal().green)),
-                                    None => ui.label(RichText::new(format!("✖ {} — pas de recherche réglée : non vérifié", i.name.trim())).size(12.5).color(pal().orange)),
+                                    Some(m) => ui.label(RichText::new(format!("✔ {}, par {m}", i.name.trim())).size(12.5).color(pal().green)),
+                                    None => ui.label(RichText::new(format!("✖ {}, pas de recherche réglée : non vérifié", i.name.trim())).size(12.5).color(pal().orange)),
                                 };
                                 if btn_small(ui, "🔍 Régler / tester").clicked() {
                                     open_search = Some(k);
@@ -18642,7 +18659,7 @@ impl App {
                     });
                     self.bd_template_editor(ui, accent);
                     ui.add_space(10.0);
-                    ui.label(RichText::new("NFO — valeurs par défaut").font(semi(13.5)).color(pal().text));
+                    ui.label(RichText::new("NFO, valeurs par défaut").font(semi(13.5)).color(pal().text));
                     ui.label(RichText::new("Appliquées telles quelles en automatique (inbox, surveillance). En manuel (Traitement, Série, Lot, Autre contenu), elles ne sont que le point de départ : chaque traitement propose ses propres choix NFO et MediaInfo, sans changer ces réglages.").size(12.0).color(pal().muted));
                     toggle(
                         ui,
@@ -18807,7 +18824,7 @@ impl App {
                 RichText::new(match crate::dl::default_origin(&self.cfg) {
                     None => "Le NZB s'ouvre sur la page Téléchargements : tu dis où tu l'as trouvé, il n'y sera jamais reposté.".to_string(),
                     Some(o) if o.is_empty() => format!("Téléchargé puis reposté sur {}.", crate::dl::default_targets(&self.cfg, "").join(", ")),
-                    Some(o) => format!("Téléchargé puis reposté sur {} — jamais sur {o}.", crate::dl::default_targets(&self.cfg, &o).join(", ")),
+                    Some(o) => format!("Téléchargé puis reposté sur {}, jamais sur {o}.", crate::dl::default_targets(&self.cfg, &o).join(", ")),
                 })
                 .size(12.0)
                 .color(pal().muted),
@@ -19211,7 +19228,7 @@ impl App {
                         match &found {
                             Some(p) => {
                                 let (kind, ver) = ngpost::par2_kind(p);
-                                ui.label(RichText::new(format!("✔ {} — {}{}", p.display(), kind.label(), ver.map(|v| format!(" ({v})")).unwrap_or_default())).size(12.0).color(pal().green));
+                                ui.label(RichText::new(format!("✔ {}, {}{}", p.display(), kind.label(), ver.map(|v| format!(" ({v})")).unwrap_or_default())).size(12.0).color(pal().green));
                                 // fichier mis dans le mauvais réglage : proposé à sa place
                                 let (warn, fix): (Option<String>, Option<&str>) = match (tool.as_str(), kind) {
                                     ("turbo", ngpost::Par2Kind::ParPar) => (Some("Ce fichier est ParPar, pas par2cmdline-turbo (il serait utilisé comme ParPar).".into()), Some("parpar")),
@@ -19271,7 +19288,7 @@ impl App {
                                     ui.painter().rect_filled(fill, cr(3), if (*t - best).abs() < 1e-9 { pal().green } else { accent.gamma_multiply(0.7) });
                                     ui.label(RichText::new(format!("{t:.1} s")).font(semi(12.5)).color(pal().text));
                                     let rel = if (*t - best).abs() < 1e-9 { "le plus rapide".to_string() } else { format!("{:.1}× plus lent", t / best) };
-                                    ui.label(RichText::new(format!("{name} — {rel}")).size(12.0).color(pal().muted));
+                                    ui.label(RichText::new(format!("{name}, {rel}")).size(12.0).color(pal().muted));
                                 });
                             }
                             if let Some((name, _, exe)) = v.iter().filter(|x| x.1 > 0.0).min_by(|a, b| a.1.total_cmp(&b.1)) {
@@ -19498,7 +19515,7 @@ impl App {
         let title = self.m_path.as_ref().map(|p| prep::file_name(p)).unwrap_or_default();
         let mut open = true;
         let mut want_full = false;
-        egui::Window::new(RichText::new(format!("Rapport MediaInfo — {title}")).font(semi(14.0)).color(pal().text))
+        egui::Window::new(RichText::new(format!("Rapport MediaInfo, {title}")).font(semi(14.0)).color(pal().text))
             .id(Id::new("report_window"))
             .open(&mut open)
             .resizable(true)
@@ -19750,12 +19767,12 @@ impl App {
     pub fn demo_api_trace(&mut self) {
         let rel = "Film.2010.MULTi.COMPLETE.BLURAY-GRP".to_string();
         let lines = vec![
-            format!("Dépôt de {rel} sur altHUB (API Newznab) — catégorie 2050 (Movies > BluRay)"),
+            format!("Dépôt de {rel} sur altHUB (API Newznab), catégorie 2050 (Movies > BluRay)"),
             "  Déposé sur altHUB (Film Blu-ray complet) :".into(),
-            format!("    • NZB : {rel}.nzb (3,4 Mo) — 512 fichier(s) postés, 46,8 Go"),
-            format!("    • MediaInfo : {rel}.xml (41 Ko) — champ « mediainfo »"),
-            format!("    • NFO : {rel}.nfo (7 Ko), NFO d'origine (film.nfo) — champ « nfo »"),
-            format!("    • BDInfo : {rel}.bdinfo.txt (18 Ko) — gardé à côté du NZB (le NFO d'origine est envoyé)"),
+            format!("    • NZB : {rel}.nzb (3,4 Mo), 512 fichier(s) postés, 46,8 Go"),
+            format!("    • MediaInfo : {rel}.xml (41 Ko), champ « mediainfo »"),
+            format!("    • NFO : {rel}.nfo (7 Ko), NFO d'origine (film.nfo), champ « nfo »"),
+            format!("    • BDInfo : {rel}.bdinfo.txt (18 Ko), gardé à côté du NZB (le NFO d'origine est envoyé)"),
             format!("  Contenu posté de {rel} : 5 fichier(s), 44,1 Go"),
             "      film.iso  (43,9 Go)".into(),
             "      Sample/film-sample.mkv  (148 Mo)".into(),
@@ -19795,20 +19812,20 @@ impl App {
         self.find.recent = vec!["Dune 2021".into(), "The Bear S03".into(), "Interstellar 2014 2160p".into()];
         self.find.focus = false;
         self.find.items = vec![
-            it("NZBFrance", "Dune.Part.Two.2024.MULTi.2160p.UHD.BluRay.x265-GRP", 31_400_000_000, 5, "2045"),
-            it("Indexer3", "Dune.Part.Two.2024.MULTi.2160p.UHD.BluRay.x265-GRP", 31_400_000_000, 4, "2045"),
-            it("NZBFrance", "Dune.2021.FRENCH.1080p.WEB.H264-FRATERNiTY", 4_800_000_000, 30, "2040"),
-            it("Indexer3", "Dune.2021.MULTi.VFF.2160p.HDR.WEB.H265-SUPPLY", 18_200_000_000, 50, "2045"),
-            it("Usenet-Fr", "Dune.2021.MULTi.VFF.2160p.HDR.WEB.H265-SUPPLY", 18_200_000_000, 52, "2045"),
-            it("NZBFrance", "Dune.2021.MULTi.VFF.2160p.HDR.WEB.H265-SUPPLY", 18_200_000_000, 49, "2045"),
-            it("Usenet-Fr", "Dune.Prophecy.S01E01.FRENCH.1080p.WEB.H264-GRP", 2_100_000_000, 400, "5040"),
-            it("Indexer3", "Dune.2021.Soundtrack.Hans.Zimmer.WEB.FLAC", 680_000_000, 2000, "3040"),
+            it("IndexerA", "Dune.Part.Two.2024.MULTi.2160p.UHD.BluRay.x265-GRP", 31_400_000_000, 5, "2045"),
+            it("IndexerB", "Dune.Part.Two.2024.MULTi.2160p.UHD.BluRay.x265-GRP", 31_400_000_000, 4, "2045"),
+            it("IndexerA", "Dune.2021.FRENCH.1080p.WEB.H264-FRATERNiTY", 4_800_000_000, 30, "2040"),
+            it("IndexerB", "Dune.2021.MULTi.VFF.2160p.HDR.WEB.H265-SUPPLY", 18_200_000_000, 50, "2045"),
+            it("IndexerC", "Dune.2021.MULTi.VFF.2160p.HDR.WEB.H265-SUPPLY", 18_200_000_000, 52, "2045"),
+            it("IndexerA", "Dune.2021.MULTi.VFF.2160p.HDR.WEB.H265-SUPPLY", 18_200_000_000, 49, "2045"),
+            it("IndexerC", "Dune.Prophecy.S01E01.FRENCH.1080p.WEB.H264-GRP", 2_100_000_000, 400, "5040"),
+            it("IndexerB", "Dune.2021.Soundtrack.Hans.Zimmer.WEB.FLAC", 680_000_000, 2000, "3040"),
         ];
         self.find.status = vec![
-            Status { indexer: "NZBFrance".into(), count: 3, secs: 0.8, http: Some(200), request: "GET https://api.nzbfrance.example/api?t=search&q=Dune+2021&apikey=••••".into(), error: None },
-            Status { indexer: "Indexer3".into(), count: 3, secs: 1.2, http: Some(200), request: "GET https://api.indexer3.example/api?t=search&q=Dune+2021&apikey=••••".into(), error: None },
-            Status { indexer: "Usenet-Fr".into(), count: 2, secs: 2.1, http: Some(200), request: String::new(), error: None },
-            Status { indexer: "Indexer2".into(), count: 0, secs: 0.4, http: Some(429), request: String::new(), error: Some("trop de requêtes (HTTP 429) : réduire la limite par minute".into()) },
+            Status { indexer: "IndexerA".into(), count: 3, secs: 0.8, http: Some(200), request: "GET https://indexer-a.example/api?t=search&q=Dune+2021&apikey=••••".into(), error: None },
+            Status { indexer: "IndexerB".into(), count: 3, secs: 1.2, http: Some(200), request: "GET https://indexer-b.example/api?t=search&q=Dune+2021&apikey=••••".into(), error: None },
+            Status { indexer: "IndexerC".into(), count: 2, secs: 2.1, http: Some(200), request: String::new(), error: None },
+            Status { indexer: "IndexerD".into(), count: 0, secs: 0.4, http: Some(429), request: String::new(), error: Some("trop de requêtes (HTTP 429) : réduire la limite par minute".into()) },
         ];
         self.find.groups = crate::finder::merge(&self.find.items);
         self.find.busy = vec![(crate::search::norm("Dune.2021.FRENCH.1080p.WEB.H264-FRATERNiTY"), "repost".into())];
@@ -19935,7 +19952,7 @@ impl App {
         let t = self.idx_tools.entry(name).or_default();
         t.doc = Some(crate::apidoc::analyze(&text));
         t.doc_text = text;
-        t.auto_log = vec!["✔ Capacités lues : 32 catégories, 41 groupes".into(), "✔ Clé acceptée (recherche test)".into(), "✖ t=nzbadd : HTTP 405 — l'envoi n'est pas sur /api".into(), "✔ Adresse d'envoi trouvée : https://lien.indexer/v1/upload".into()];
+        t.auto_log = vec!["✔ Capacités lues : 32 catégories, 41 groupes".into(), "✔ Clé acceptée (recherche test)".into(), "✖ t=nzbadd : HTTP 405, l'envoi n'est pas sur /api".into(), "✔ Adresse d'envoi trouvée : https://indexer2.example/v1/upload".into()];
         // indexer réglé comme après la configuration automatique (recherche /api, envoi /v1)
         if let Ok(caps) = std::env::var("CAPS") {
             let body = std::fs::read_to_string(caps).unwrap_or_default();
@@ -20172,7 +20189,7 @@ impl eframe::App for App {
         }
         self.autosave();
         // fenêtre invisible (zone de notification, ou réduite) : rien n'est dessiné, et surtout
-        // aucune image n'est demandée — Windows ne la livrerait jamais à une fenêtre cachée et
+        // aucune image n'est demandée, Windows ne la livrerait jamais à une fenêtre cachée et
         // eframe tournerait à vide en l'attendant (les 12-13 % de processeur). Les événements
         // des fils de fond sont traités ci-dessus par `pump`, à chaque battement (2 s).
         let minimized = ctx.input(|i| i.viewport().minimized.unwrap_or(false));

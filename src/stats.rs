@@ -62,7 +62,7 @@ impl PostRec {
         self.end.saturating_sub(self.start).max(1)
     }
     /// Temps d'envoi seul (secondes) : d'après le débit moyen annoncé par NgPost, qui ne
-    /// compte que l'envoi — pas la compression, le par2 ni la vérification du NZB.
+    /// compte que l'envoi, pas la compression, le par2 ni la vérification du NZB.
     pub fn upload_secs(&self) -> f64 {
         if self.avg_bps > 0.0 && self.bytes > 0 {
             (self.bytes as f64 / self.avg_bps).min(self.duration() as f64).max(0.001)

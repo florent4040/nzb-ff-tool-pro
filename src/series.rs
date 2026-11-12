@@ -102,7 +102,7 @@ impl Scan {
         // plusieurs saisons : elles doivent se suivre (S01-S03 sans S02 n'est pas complet)
         real.windows(2).all(|w| w[1] == w[0] + 1) && (real.len() == 1 || real[0] == 1)
     }
-    /// Mention COMPLETE automatique : seulement pour une série entière livrée d'un bloc —
+    /// Mention COMPLETE automatique : seulement pour une série entière livrée d'un bloc,
     /// dossier de la série (pas une saison seule), au moins deux saisons depuis S01, toutes
     /// sans épisode manquant, et toutes dans cette release. Une saison seule n'est jamais
     /// « complète » d'office : rien ne dit qu'il ne manque pas d'autres saisons ou épisodes.

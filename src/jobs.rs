@@ -197,7 +197,7 @@ fn note_record(rec: &Record) {
     match rec.status {
         Status::Sent => crate::notify::record(format!("✔ Préparée : {} ({})", rec.release, prep::human_size(rec.size))),
         _ if prep::is_cancel(&rec.reason) => crate::notify::record(format!("⏹ Arrêtée : {}", rec.original)),
-        _ => crate::notify::record(format!("✖ Échec du traitement : {} — {}", rec.original, rec.reason)),
+        _ => crate::notify::record(format!("✖ Échec du traitement : {}, {}", rec.original, rec.reason)),
     }
 }
 
@@ -316,7 +316,7 @@ fn note_left(rec: &mut Record, done: &prep::Done) {
     }
     let (p, e) = &done.left[0];
     let more = if done.left.len() > 1 { format!(" (et {} autre(s))", done.left.len() - 1) } else { String::new() };
-    let msg = format!("copié, mais l'original n'a pas pu être supprimé : {}{more} — {e}", p.display());
+    let msg = format!("copié, mais l'original n'a pas pu être supprimé : {}{more}, {e}", p.display());
     crate::notify::record(format!("⚠ {} : {msg}", rec.release));
     rec.reason = msg;
 }
@@ -457,7 +457,7 @@ pub fn run_series(
 }
 
 /// Tours de post d'une série : toute la sélection (intégrale / complète), puis une release par
-/// saison, puis une par épisode — chacun au choix.
+/// saison, puis une par épisode, chacun au choix.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Rounds {
     pub whole: bool,

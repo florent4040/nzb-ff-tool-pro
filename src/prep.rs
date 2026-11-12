@@ -3089,7 +3089,7 @@ mod tests_secrets {
         assert_eq!(redact("mot de passe des archives : Zx81"), "mot de passe des archives : Zx81");
         assert_eq!(redact("Compression : oui · mot de passe aucun"), "Compression : oui · mot de passe aucun");
         // texte accentué intact
-        assert_eq!(redact("Échec : déjà là — pass: é"), format!("Échec : déjà là — pass: {MASK}"));
+        assert_eq!(redact("Échec : déjà là, pass: é"), format!("Échec : déjà là, pass: {MASK}"));
         // trop court pour être cherché tel quel : non enregistré
         add_secret("ab");
         assert_eq!(redact("abc ab"), "abc ab");

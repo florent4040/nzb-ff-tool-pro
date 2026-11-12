@@ -3,7 +3,7 @@
 //! Chaque indexer actif qui sait chercher est interrogé par son profil d'API (`apidef`) : même
 //! requête que la vérification avant post, donc même clé (jamais sur une ligne de commande),
 //! même limite de requêtes par minute. Les résultats sont regroupés par nom de release : pour
-//! chacune on voit sur quels indexers elle est, et surtout où elle manque — pour la
+//! chacune on voit sur quels indexers elle est, et surtout où elle manque, pour la
 //! télécharger puis la reposter là.
 
 use crate::prep::{Config, IndexerCfg};
