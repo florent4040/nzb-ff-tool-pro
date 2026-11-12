@@ -1,0 +1,165 @@
+# Compilation et publication de NZB FF Tool Pro.
+#
+# - Envoi d'un tag « vX.Y.Z » (git push origin v3.26.0) : l'exe est compilé ici, à partir du code
+#   public, puis publié dans une release avec ses empreintes SHA-256, une attestation de
+#   provenance signée (Sigstore) et, si la clé est réglée, l'analyse VirusTotal.
+# - Lancement à la main (onglet Actions → Release → Run workflow) : compilation seule, l'exe
+#   est téléchargeable dans « Artifacts », rien n'est publié. Pratique pour tester.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write       # créer la release
+  id-token: write       # signer l'attestation de provenance (Sigstore)
+  attestations: write   # enregistrer l'attestation
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      VT_API_KEY: ${{ secrets.VT_API_KEY }}
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Lire la version
+        id: ver
+        run: |
+          $v = (Select-String -Path Cargo.toml -Pattern '^version\s*=\s*"([^"]+)"' | Select-Object -First 1).Matches[0].Groups[1].Value
+          if (-not $v) { throw "version introuvable dans Cargo.toml" }
+          if ($env:GITHUB_REF_TYPE -eq "tag" -and $env:GITHUB_REF_NAME -ne "v$v") {
+            throw "Le tag $($env:GITHUB_REF_NAME) ne correspond pas à la version de Cargo.toml (v$v)"
+          }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Version $v"
+
+      - name: Installer MinGW-w64 (UCRT)
+        id: msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          install: mingw-w64-ucrt-x86_64-gcc
+
+      - name: Installer Rust (chaîne GNU)
+        run: |
+          "${{ steps.msys2.outputs.msys2-location }}\ucrt64\bin" >> $env:GITHUB_PATH
+          rustup toolchain install stable-x86_64-pc-windows-gnu --profile minimal
+          rustup default stable-x86_64-pc-windows-gnu
+
+      - name: Compiler
+        run: |
+          gcc --version | Select-Object -First 1
+          rustc --version
+          if (Test-Path Cargo.lock) { cargo build --release --locked } else { cargo build --release }
+
+      - name: Préparer les fichiers
+        id: pack
+        run: |
+          $v = "${{ steps.ver.outputs.version }}"
+          New-Item -ItemType Directory -Force out, pack | Out-Null
+          $exe = "NZB-FF-Tool-Pro-$v.exe"
+          Copy-Item target\release\nzbff.exe "out\$exe"
+          Copy-Item target\release\nzbff.exe "pack\NZB FF Tool Pro.exe"
+          Copy-Item LISEZMOI.md, LICENSE pack\
+          $zip = "NZB-FF-Tool-Pro-$v-windows-x64.zip"
+          Compress-Archive -Path pack\* -DestinationPath "out\$zip"
+          # empreintes SHA-256 (format de sha256sum)
+          Get-ChildItem out\*.exe, out\*.zip | ForEach-Object {
+            "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          } | Set-Content out\SHA256SUMS.txt -Encoding utf8
+          Get-Content out\SHA256SUMS.txt
+          "exe=$exe" >> $env:GITHUB_OUTPUT
+          "zip=$zip" >> $env:GITHUB_OUTPUT
+
+      - name: Attestation de provenance signée
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            out/*.exe
+            out/*.zip
+
+      - name: Notes de version
+        run: |
+          $v = "${{ steps.ver.outputs.version }}"
+          $mm = ($v -split '\.')[0..1] -join '.'
+          $text = Get-Content LISEZMOI.md -Raw -Encoding utf8
+          $m = [regex]::Match($text, "(?ms)^## Nouveautés de la $([regex]::Escape($mm))\s*\r?\n(.*?)(?=^## |\z)")
+          $notes = if ($m.Success) { $m.Groups[1].Value.Trim() } else { "Voir LISEZMOI.md." }
+          $vt = [bool]$env:VT_API_KEY
+          $rows = Get-Content out\SHA256SUMS.txt | ForEach-Object {
+            $h, $f = $_ -split '\s+', 2
+            if ($vt) { "| ``$f`` | ``$h`` | [Rapport VirusTotal](https://www.virustotal.com/gui/file/$h) |" } else { "| ``$f`` | ``$h`` |" }
+          }
+          $head = if ($vt) { "| Fichier | SHA-256 | Analyse |`n|---|---|---|" } else { "| Fichier | SHA-256 |`n|---|---|" }
+          $sums = $head + "`n" + ($rows -join "`n")
+          $vtline = if ($vt) { "Chaque fichier a été envoyé à VirusTotal pendant la compilation : le lien ouvre son analyse par une soixantaine d'antivirus (quelques minutes peuvent être nécessaires après la publication)." } else { "" }
+          $repo = $env:GITHUB_REPOSITORY
+          $exe = "${{ steps.pack.outputs.exe }}"
+          @"
+          ## Nouveautés
+
+          $notes
+
+          ## Téléchargement
+
+          - **${{ steps.pack.outputs.zip }}** : l'application, son mode d'emploi et la licence (recommandé).
+          - **$exe** : l'application seule.
+
+          Rien à installer : décompresse, puis lance ``NZB FF Tool Pro.exe``. Les réglages sont créés à côté de l'exe.
+
+          ## Fichiers vérifiables
+
+          Ces fichiers ont été compilés par GitHub Actions directement à partir du code de ce dépôt (commit ``$($env:GITHUB_SHA.Substring(0,7))``), pas sur un PC.
+
+          $sums
+
+          $vtline
+
+          Vérifier sous Windows (PowerShell) :
+
+              Get-FileHash .\$exe -Algorithm SHA256
+
+          **Provenance signée** : avec GitHub CLI, ``gh attestation verify $exe --repo $repo`` confirme que le fichier vient bien de ce dépôt et de cette compilation.
+
+          ## Avertissement Windows
+
+          L'exe n'est pas signé par un certificat payant : au premier lancement, Windows SmartScreen peut afficher « Windows a protégé votre ordinateur ». Clique sur **Informations complémentaires**, puis **Exécuter quand même**. Le code source complet est dans ce dépôt, sans télémétrie.
+          "@ | Set-Content out\NOTES.md -Encoding utf8
+          Get-Content out\NOTES.md
+
+      - name: Analyse VirusTotal (si la clé VT_API_KEY est réglée)
+        if: github.ref_type == 'tag' && env.VT_API_KEY != ''
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            out/${{ steps.pack.outputs.exe }}
+            out/${{ steps.pack.outputs.zip }}
+
+      - name: Garder les fichiers (lancement à la main)
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: NZB-FF-Tool-Pro-${{ steps.ver.outputs.version }}
+          path: out/
+
+      - name: Publier la release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: NZB FF Tool Pro ${{ steps.ver.outputs.version }}
+          body_path: out/NOTES.md
+          files: |
+            out/${{ steps.pack.outputs.exe }}
+            out/${{ steps.pack.outputs.zip }}
+            out/SHA256SUMS.txt
