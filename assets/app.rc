@@ -1,0 +1,27 @@
+// Ressources Windows de NZB FF Tool Pro : icône de l'exe + informations de version.
+1 ICON "app.ico"
+
+1 VERSIONINFO
+FILEVERSION 3,26,0,0
+PRODUCTVERSION 3,26,0,0
+FILEOS 0x40004
+FILETYPE 0x1
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040C04B0"
+    BEGIN
+      VALUE "CompanyName", "sawo"
+      VALUE "FileDescription", "NZB FF Tool Pro"
+      VALUE "FileVersion", "3.26.0"
+      VALUE "InternalName", "nzbff"
+      VALUE "OriginalFilename", "NZB FF Tool Pro.exe"
+      VALUE "ProductName", "NZB FF Tool Pro"
+      VALUE "ProductVersion", "3.26.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x040C, 1200
+  END
+END

@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------
+#  Ne jamais publier : compilation et DONNÉES PERSONNELLES de l'application
+# ---------------------------------------------------------------------------
+
+# Compilation
+/target/
+
+# Dossier de l'application compilée : il contient tes réglages (clés API,
+# mots de passe Usenet et e-mail), ton historique, tes journaux et tes NZB.
+/dist/
+
+# Par sécurité, partout dans le projet : réglages, historiques, journaux…
+*.conf
+*.conf.*
+nzbff-*.tsv
+nzbff-*.csv
+.nzbff-*
+*.log
+logs/
+*.eml
+*.curl
+*.nzb
+recherche/
+cache/
+tmp/
+bdinfo/
+sauvegarde/
+
+# Windows
+Thumbs.db
+desktop.ini

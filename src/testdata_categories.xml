@@ -1,0 +1,151 @@
+<categories>
+<category id="3000" name="Audio">
+<subcat id="3010" name="MP3"/>
+<subcat id="3020" name="Video"/>
+<subcat id="3030" name="Audiobook"/>
+<subcat id="3040" name="Lossless"/>
+<subcat id="3130" name="Audiobook - DE"/>
+<subcat id="3230" name="Audiobook - ES"/>
+<subcat id="3330" name="Audiobook - FR"/>
+<subcat id="3050" name="Other"/>
+</category>
+<category id="7000" name="Books">
+<subcat id="7010" name="Mags"/>
+<subcat id="7020" name="Ebook"/>
+<subcat id="7030" name="Comics"/>
+</category>
+<category id="7100" name="Books - DE">
+<subcat id="7110" name="Mags"/>
+<subcat id="7120" name="Ebook"/>
+<subcat id="7130" name="Comics"/>
+</category>
+<category id="7300" name="Books - FR">
+<subcat id="7310" name="Mags"/>
+<subcat id="7320" name="Ebook"/>
+<subcat id="7330" name="Comics"/>
+</category>
+<category id="1000" name="Console">
+<subcat id="1010" name="NDS"/>
+<subcat id="1020" name="PSP"/>
+<subcat id="1030" name="Wii"/>
+<subcat id="1035" name="Switch"/>
+<subcat id="1040" name="Xbox"/>
+<subcat id="1050" name="Xbox 360"/>
+<subcat id="1060" name="WiiWare/VC"/>
+<subcat id="1070" name="XBOX 360 DLC"/>
+<subcat id="1080" name="PS3"/>
+<subcat id="1090" name="Xbox One"/>
+<subcat id="1100" name="PS4"/>
+<subcat id="1110" name="PS5"/>
+</category>
+<category id="2000" name="Movies">
+<subcat id="2010" name="Foreign"/>
+<subcat id="2030" name="SD"/>
+<subcat id="2040" name="HD"/>
+<subcat id="2041" name="720p"/>
+<subcat id="2042" name="1080p"/>
+<subcat id="2045" name="UHD"/>
+<subcat id="2050" name="BluRay"/>
+<subcat id="2060" name="3D"/>
+<subcat id="2020" name="Other"/>
+</category>
+<category id="2100" name="Movies - DE">
+<subcat id="2130" name="SD"/>
+<subcat id="2140" name="HD"/>
+<subcat id="2141" name="720p"/>
+<subcat id="2142" name="1080p"/>
+<subcat id="2145" name="UHD"/>
+<subcat id="2150" name="BluRay"/>
+<subcat id="2160" name="3D"/>
+<subcat id="2120" name="Other"/>
+</category>
+<category id="2200" name="Movies - ES">
+<subcat id="2230" name="SD"/>
+<subcat id="2240" name="HD"/>
+<subcat id="2241" name="720p"/>
+<subcat id="2242" name="1080p"/>
+<subcat id="2245" name="UHD"/>
+<subcat id="2250" name="BluRay"/>
+<subcat id="2260" name="3D"/>
+<subcat id="2220" name="Other"/>
+</category>
+<category id="2300" name="Movies - FR">
+<subcat id="2330" name="SD"/>
+<subcat id="2340" name="HD"/>
+<subcat id="2341" name="720p"/>
+<subcat id="2342" name="1080p"/>
+<subcat id="2345" name="UHD"/>
+<subcat id="2350" name="BluRay"/>
+<subcat id="2360" name="3D"/>
+<subcat id="2320" name="Other"/>
+</category>
+<category id="8000" name="Other">
+<subcat id="8010" name="Misc"/>
+</category>
+<category id="4000" name="PC">
+<subcat id="4010" name="0day"/>
+<subcat id="4020" name="ISO"/>
+<subcat id="4030" name="Mac"/>
+<subcat id="4035" name="Linux"/>
+<subcat id="4040" name="Mobile-Other"/>
+<subcat id="4050" name="Games"/>
+<subcat id="4060" name="Mobile-iOS"/>
+<subcat id="4070" name="Mobile-Android"/>
+<subcat id="4080" name="3D-Print"/>
+<subcat id="4090" name="Tutorials"/>
+<subcat id="4100" name="Pico"/>
+</category>
+<category id="5000" name="TV">
+<subcat id="5020" name="Foreign"/>
+<subcat id="5030" name="SD"/>
+<subcat id="5040" name="HD"/>
+<subcat id="5041" name="720p"/>
+<subcat id="5042" name="1080p"/>
+<subcat id="5045" name="UHD"/>
+<subcat id="5060" name="Sport"/>
+<subcat id="5070" name="Anime"/>
+<subcat id="5080" name="Documentary"/>
+<subcat id="5050" name="Other"/>
+</category>
+<category id="5100" name="TV - DE">
+<subcat id="5130" name="SD"/>
+<subcat id="5140" name="HD"/>
+<subcat id="5141" name="720p"/>
+<subcat id="5142" name="1080p"/>
+<subcat id="5145" name="UHD"/>
+<subcat id="5160" name="Sport"/>
+<subcat id="5170" name="Anime"/>
+<subcat id="5180" name="Documentary"/>
+<subcat id="5150" name="Other"/>
+</category>
+<category id="5200" name="TV - ES">
+<subcat id="5230" name="SD"/>
+<subcat id="5240" name="HD"/>
+<subcat id="5241" name="720p"/>
+<subcat id="5242" name="1080p"/>
+<subcat id="5245" name="UHD"/>
+<subcat id="5260" name="Sport"/>
+<subcat id="5270" name="Anime"/>
+<subcat id="5280" name="Documentary"/>
+<subcat id="5250" name="Other"/>
+</category>
+<category id="5300" name="TV - FR">
+<subcat id="5330" name="SD"/>
+<subcat id="5340" name="HD"/>
+<subcat id="5341" name="720p"/>
+<subcat id="5342" name="1080p"/>
+<subcat id="5345" name="UHD"/>
+<subcat id="5360" name="Sport"/>
+<subcat id="5370" name="Anime"/>
+<subcat id="5380" name="Documentary"/>
+<subcat id="5350" name="Other"/>
+</category>
+<category id="6000" name="XXX">
+<subcat id="6010" name="DVD"/>
+<subcat id="6020" name="WMV"/>
+<subcat id="6030" name="XviD"/>
+<subcat id="6040" name="x264"/>
+<subcat id="6050" name="Pack"/>
+<subcat id="6060" name="ImgSet"/>
+<subcat id="6070" name="Other"/>
+</category>
