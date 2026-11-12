@@ -182,8 +182,15 @@ Version **3.26.0**. Rust, interface native (egui), un seul `.exe`, **aucune tél
 
 ### Télécharger l'application
 
-La version compilée est dans les [Releases](../../releases) : télécharge
-`NZB FF Tool Pro.exe` et lance-le. Rien à installer.
+La version compilée est dans les [Releases](../../releases) : télécharge le zip, décompresse-le et lance `NZB FF Tool Pro.exe`. Rien à installer.
+
+Chaque version est compilée par GitHub Actions directement à partir de ce code, pas sur un PC. Dans chaque release :
+
+- **empreintes SHA-256** de chaque fichier : sous PowerShell, `Get-FileHash .\fichier -Algorithm SHA256` doit donner la même valeur ;
+- **analyse VirusTotal** : un lien par fichier ouvre son analyse par une soixantaine d'antivirus ;
+- **provenance signée** : `gh attestation verify fichier --repo florent4040/nzb-ff-tool-pro` confirme que le fichier sort bien de ce dépôt.
+
+L'exe n'est pas signé par un certificat payant : au premier lancement, Windows SmartScreen peut afficher « Windows a protégé votre ordinateur ». Clique sur **Informations complémentaires**, puis **Exécuter quand même**.
 
 ### Compiler soi-même
 
